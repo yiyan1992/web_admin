@@ -21,20 +21,56 @@
             </el-tree>
         </div>
         <div id="right">
-            <el-form :model="treeData" :rules="rules" hide-required-asterisk label-width="70px" ref="treeData"
+            <el-form :model="formData" :rules="rules" hide-required-asterisk label-width="70px" ref="treeData"
                      size="small">
                 <el-form-item label="用户名" prop="username">
-                    <el-input v-model="treeData.username"/>
+                    <el-input v-model="formData.username"/>
                 </el-form-item>
                 <el-form-item label="密 码" prop="password">
-                    <el-input v-model="treeData.password"/>
+                    <el-input v-model="formData.password"/>
                 </el-form-item>
                 <el-form-item>
                     <el-button @click="submit('form')" type="primary">登陆</el-button>
                 </el-form-item>
             </el-form>
         </div>
+
+        <el-dialog :visible.sync="createDialogVisible" center title="添加" width="30%">
+
+            <el-dialog
+                    :visible.sync="folderDialogVisible"
+                    append-to-body
+                    title="文件夹名称"
+                    width="30%">
+                <el-row>
+                    <el-input v-model="newFolderName"></el-input>
+                </el-row>
+                <span class="dialog-footer" slot="footer">
+                    <el-button @click="folderDialogVisible = false">取 消</el-button>
+                    <el-button @click="folderDialogVisible = false">确 定</el-button>
+                </span>
+            </el-dialog>
+
+            <el-row>
+                <el-col :span="6">
+                    <el-button @click="createDataSource(-1)">文件夹</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button @click="createDataSource(0)">MYSQL</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button @click="createDataSource(1)">ORACLE</el-button>
+                </el-col>
+                <el-col :span="6">
+                    <el-button @click="createDataSource(2)">EXCEL</el-button>
+                </el-col>
+            </el-row>
+            <span class="dialog-footer" slot="footer">
+                <el-button @click="createDialogVisible = false">取 消</el-button>
+            </span>
+        </el-dialog>
     </div>
+
 </template>
 
 
@@ -45,9 +81,13 @@
     @Component
     export default class DataSource extends Vue {
 
+        private createDialogVisible: boolean = false;
+        private folderDialogVisible: boolean = false;
+        private newFolderName = "";
+
         private tree!: TreeData[];
 
-        private treeData: TreeData = new TreeData(0, "");
+        private formData: TreeData = new TreeData(0, "");
         private rules = {
             username: [
                 {required: true, message: "请输入用户名", trigger: "blur"},
@@ -57,32 +97,44 @@
         };
 
         created() {
-            let v = new TreeData(1, "a");
-            this.tree = [
-                v,
-                new TreeData(2, "a"),
-                new TreeData(3, "a"),
-                new TreeData(4, "a"),
-                new TreeData(5, "a"),
-            ];
             this.loadTree();
         }
 
         loadTree() {
             Axios.post("queryDataSourceByUser", {}).then((result) => {
                 // console.log(result);
+
             });
         }
 
         showDialog() {
-            //显示弹窗
+            this.createDialogVisible = true;
+        }
+
+        createDataSource(createType: number) {
+            debugger
+            switch (createType) {
+                case -1:
+                    this.folderDialogVisible = true;
+                    break;
+            }
+            console.log(createType);
+        }
+
+        createFolder(folderName: string) {
+            let parentId;
+            if (this.tree == undefined || this.tree.length == 0) {
+                parentId = undefined;
+            }
+
+            let userId = "";
         }
 
         submit(form: string) {
             const ref: any = this.$refs[form];
             ref.validate((valid: boolean) => {
                 if (valid) {
-                    console.log(this.treeData.label)
+                    console.log(this.formData.label)
                 }
             });
         }
