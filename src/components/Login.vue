@@ -1,12 +1,12 @@
 <template>
     <div id="app">
         <img alt="Vue logo" src="../assets/logo.png">
-        <el-form :model="form" :rules="rules" ref="form" label-width="70px" hide-required-asterisk="true" size="small">
+        <el-form :model="form" :rules="rules" hide-required-asterisk label-width="70px" ref="form" size="small">
             <el-form-item label="用户名" prop="username">
-                <el-input v-model="form.username"></el-input>
+                <el-input v-model="form.username"/>
             </el-form-item>
             <el-form-item label="密 码" prop="password">
-                <el-input v-model="form.password" show-password></el-input>
+                <el-input show-password v-model="form.password"/>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="submit('form')">登陆</el-button>
@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-    import {Component, Prop, Vue} from 'vue-property-decorator';
+    import {Component, Vue} from 'vue-property-decorator';
 
     @Component
     export default class Login extends Vue {

@@ -8,11 +8,6 @@
     import {Vue} from 'vue-property-decorator';
 
     export default class App extends Vue {
-
-        created(){
-            this.$router.replace("/home")
-        }
-
     }
 </script>
 
