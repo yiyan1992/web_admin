@@ -3,54 +3,128 @@
 
         <div id="left">
             <span>数据连接 </span>
-            <el-button @click="showDialog" circle icon="el-icon-plus" size="small" type="primary"/>
+            <el-button @click="showDialog(0)" icon="el-icon-plus" size="mini"/>
             <el-tree
                     :allow-drag="allowDrag"
                     :allow-drop="allowDrop"
-                    :data="tree"
+                    :data="treeData"
                     @node-click="handleNodeClick"
-                    @node-drag-end="handleDragEnd"
-                    @node-drag-enter="handleDragEnter"
-                    @node-drag-leave="handleDragLeave"
-                    @node-drag-over="handleDragOver"
-                    @node-drag-start="handleDragStart"
                     @node-drop="handleDrop"
                     default-expand-all
                     draggable
+                    highlight-current
                     node-key="id">
+                  <span class="custom-tree-node" slot-scope="{ node, data }">
+                      <span><span class="el-icon-folder" v-if="data.type==-1"/>
+                          <span class="el-icon-tickets" v-if="data.type!=-1"/> {{ data.name }}</span>
+                    <span>
+                      <el-button @click="() => add(node,data)" style="font-size: 20px;" type="text"
+                                 v-if="data.type==-1">+</el-button>
+                      <el-button @click="() => remove(node, data)" style="font-size: 20px;" type="text">-</el-button>
+                    </span>
+                  </span>
             </el-tree>
         </div>
         <div id="right">
-            <el-form :model="formData" :rules="rules" hide-required-asterisk label-width="70px" ref="treeData"
-                     size="small">
-                <el-form-item label="用户名" prop="username">
-                    <el-input v-model="formData.username"/>
-                </el-form-item>
-                <el-form-item label="密 码" prop="password">
-                    <el-input v-model="formData.password"/>
+
+            <!--文件夹 form-->
+            <el-form :model="folderForm" :rules="rules" label-width="100px" ref="folderForm"
+                     v-if="visibleMap.folderFormVisible">
+                <el-form-item label="文件夹名称" prop="name">
+                    <el-input v-model="folderForm.name"/>
                 </el-form-item>
                 <el-form-item>
-                    <el-button @click="submit('form')" type="primary">登陆</el-button>
+                    <el-button @click="createFolder('folderForm')">创建</el-button>
+                    <el-button @click="visibleMap.folderFormVisible = false">取 消</el-button>
                 </el-form-item>
             </el-form>
+
+            <!--MYSQL form-->
+            <el-form :model="mysqlForm" :rules="rules" label-width="100px"
+                     ref="mysqlForm" v-if="visibleMap.mysqlFormVisible">
+                <el-form-item label="数据源名称" prop="name">
+                    <el-input v-model="mysqlForm.name"/>
+                </el-form-item>
+                <el-form-item label="服务器" prop="serverAddress">
+                    <el-input v-model="mysqlForm.serverAddress"/>
+                </el-form-item>
+                <el-form-item label="数据库名称" prop="databaseName">
+                    <el-input v-model="mysqlForm.databaseName"/>
+                </el-form-item>
+                <el-form-item label="端口" prop="port">
+                    <el-input v-model="mysqlForm.port"/>
+                </el-form-item>
+                <el-form-item label="用户名" prop="username">
+                    <el-input v-model="mysqlForm.username"/>
+                </el-form-item>
+                <el-form-item label="密 码" prop="password">
+                    <el-input v-model="mysqlForm.password"/>
+                </el-form-item>
+                <el-form-item>
+                    <el-button @click="createdSqlDataSource('mysqlForm')">连接</el-button>
+                    <el-button @click="visibleMap.mysqlFormVisible=false">取消</el-button>
+                </el-form-item>
+            </el-form>
+
+            <!--ORACLE form-->
+            <el-form :model="oracleForm" :rules="rules" label-width="100px"
+                     ref="oracleForm" v-if="visibleMap.oracleFormVisible">
+                <el-form-item label="数据源名称" prop="name">
+                    <el-input v-model="oracleForm.name"/>
+                </el-form-item>
+                <el-form-item label="服务器" prop="serverAddress">
+                    <el-input v-model="oracleForm.serverAddress"/>
+                </el-form-item>
+                <el-form-item label="数据库名称" prop="databaseName">
+                    <el-input v-model="oracleForm.databaseName"/>
+                </el-form-item>
+                <el-form-item label="端口" prop="port">
+                    <el-input v-model="oracleForm.port"/>
+                </el-form-item>
+                <el-form-item label="用户名" prop="username">
+                    <el-input v-model="oracleForm.username"/>
+                </el-form-item>
+                <el-form-item label="密 码" prop="password">
+                    <el-input v-model="oracleForm.password"/>
+                </el-form-item>
+                <el-form-item label="SID" prop="password">
+                    <el-input v-model="oracleForm.sId"/>
+                </el-form-item>
+                <el-form-item>
+                    <el-button @click="createdSqlDataSource('oracleForm')">连接</el-button>
+                    <el-button @click="visibleMap.oracleFormVisible=false">取消</el-button>
+                </el-form-item>
+            </el-form>
+
+            <!--Excel form-->
+            <el-form :model="excelForm" :rules="rules" label-width="100px"
+                     ref="excelForm" v-if="visibleMap.excelFormVisible">
+                <el-form-item label="数据源名称" prop="name">
+                    <el-input v-model="excelForm.name"/>
+                </el-form-item>
+                <el-form-item>
+                    <el-upload
+                            :before-upload="beforeUpload"
+                            :file-list="fileList"
+                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                            action="http://aaa"
+                            class="upload-demo"
+                            drag
+                            multiple>
+                        <i class="el-icon-upload"></i>
+                        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                        <div class="el-upload__tip" slot="tip">只能上传excel文件，且不超过10M</div>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item>
+                    <el-button @click="createExcelSource('excelForm')">确 定</el-button>
+                    <el-button @click="visibleMap.excelFormVisible=false">取 消</el-button>
+                </el-form-item>
+            </el-form>
+
         </div>
 
-        <el-dialog :visible.sync="createDialogVisible" center title="添加" width="30%">
-
-            <el-dialog
-                    :visible.sync="folderDialogVisible"
-                    append-to-body
-                    title="文件夹名称"
-                    width="30%">
-                <el-row>
-                    <el-input v-model="newFolderName"></el-input>
-                </el-row>
-                <span class="dialog-footer" slot="footer">
-                    <el-button @click="folderDialogVisible = false">取 消</el-button>
-                    <el-button @click="folderDialogVisible = false">确 定</el-button>
-                </span>
-            </el-dialog>
-
+        <el-dialog :visible.sync="visibleMap.createDialogVisible" center title="添加" width="30%">
             <el-row>
                 <el-col :span="6">
                     <el-button @click="createDataSource(-1)">文件夹</el-button>
@@ -66,7 +140,7 @@
                 </el-col>
             </el-row>
             <span class="dialog-footer" slot="footer">
-                <el-button @click="createDialogVisible = false">取 消</el-button>
+                <el-button @click="visibleMap.createDialogVisible = false">取 消</el-button>
             </span>
         </el-dialog>
     </div>
@@ -76,127 +150,312 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import Axios from "axios";
 
     @Component
     export default class DataSource extends Vue {
 
-        private createDialogVisible: boolean = false;
-        private folderDialogVisible: boolean = false;
-        private newFolderName = "";
+        //树数据
+        private treeData = [];
+        //数配置
+        private treeProp = {
+            label: function (data: any, node: any) {
+                return data.name;
+            },
+            children: "children",
+            disabled: "disabled",
+            isLeaf: "isLeaf"
+        };
 
-        private tree!: TreeData[];
+        //显示flag
+        private visibleMap = {
+            folderFormVisible: false,
+            mysqlFormVisible: false,
+            oracleFormVisible: false,
+            excelFormVisible: false,
+            createDialogVisible: false,
+        };
 
-        private formData: TreeData = new TreeData(0, "");
+        //文件夹Form
+        private folderForm = {
+            id: "",
+            name: "",
+            type: "-1",
+            parentId: "",
+        };
+
+        private mysqlForm = {
+            id: "",
+            name: "",
+            serverAddress: "",
+            databaseName: "",
+            driverClass: "com.mysql.cj.jdbc.Driver",
+            url: "",
+            port: "",
+            username: "",
+            password: "",
+            type: "0",
+            parentId: ""
+        };
+
+        private oracleForm = {
+            id: "",
+            name: "",
+            serverAddress: "",
+            databaseName: "",
+            driverClass: "com.mysql.cj.jdbc.Driver",
+            url: "",
+            port: "",
+            username: "",
+            password: "",
+            sId: "",
+            type: "0",
+            parentId: ""
+        };
+
+        private excelForm = {
+            id: "",
+            name: "",
+            url: "",
+            type: "1",
+            parentId: "",
+        };
+
+        private fileList = [];
+
+
         private rules = {
-            username: [
-                {required: true, message: "请输入用户名", trigger: "blur"},
-                {min: 3, max: 20, message: "长度在 3 到 20 个字符", trigger: "blur"}
+            name: [
+                {required: true, message: "请输入名称", trigger: "blur"},
+                {min: 1, max: 40, message: "长度在 1 到 40 个字符", trigger: "blur"}
             ],
+            serverAddress: [{required: true, message: "请输入服务地址", trigger: "blur"},],
+            databaseName: [{required: true, message: "请输入数据库名称", trigger: "blur"},],
+            port: [{required: true, message: "请输入端口号", trigger: "blur"},],
+            username: [{required: true, message: "请输入用户名", trigger: "blur"}],
             password: [{required: true, message: "请输入密码", trigger: "blur"}]
         };
+
+        /**
+         * 当前节点
+         */
+        private currentData: any;
 
         created() {
             this.loadTree();
         }
 
         loadTree() {
-            Axios.post("queryDataSourceByUser", {}).then((result) => {
-                // console.log(result);
-
-            });
-        }
-
-        showDialog() {
-            this.createDialogVisible = true;
-        }
-
-        createDataSource(createType: number) {
-            debugger
-            switch (createType) {
-                case -1:
-                    this.folderDialogVisible = true;
-                    break;
-            }
-            console.log(createType);
-        }
-
-        createFolder(folderName: string) {
-            let parentId;
-            if (this.tree == undefined || this.tree.length == 0) {
-                parentId = undefined;
-            }
-
-            let userId = "";
-        }
-
-        submit(form: string) {
-            const ref: any = this.$refs[form];
-            ref.validate((valid: boolean) => {
-                if (valid) {
-                    console.log(this.formData.label)
+            this.axios.post("queryDataSourceByUser", {}).then((result) => {
+                if (result.data.code == 200) {
+                    this.treeData = result.data.data;
                 }
             });
         }
 
-
-        handleNodeClick(nodeData: any, node: any, ev: any) {
-            console.log('node 1', nodeData);
-            console.log('node 2', node);
+        add(node: any, data: any) {
+            if (data.type != -1) {
+                return;
+            }
+            this.currentData = data;
+            this.showDialog(1);
         }
 
-        handleDragStart(node: any, ev: any) {
-            console.log('drag start', node);
-        }
-
-        handleDragEnter(draggingNode: any, dropNode: any, ev: any) {
-            console.log('tree drag enter: ', dropNode.label);
-        }
-
-        handleDragLeave(draggingNode: any, dropNode: any, ev: any) {
-            console.log('tree drag leave: ', dropNode.label);
-        }
-
-        handleDragOver(draggingNode: any, dropNode: any, ev: any) {
-            console.log('tree drag over: ', dropNode.label);
-        }
-
-        handleDragEnd(draggingNode: any, dropNode: any, dropType: any, ev: any) {
-            console.log('tree drag end: ', dropNode && dropNode.label, dropType);
-        }
-
-        handleDrop(draggingNode: any, dropNode: any, dropType: any, ev: any) {
-            console.log('tree drop: ', dropNode.label, dropType);
-        }
-
-        allowDrop(draggingNode: any, dropNode: any, type: any) {
-            if (dropNode.data.label === '二级 3-1') {
-                return type !== 'inner';
+        remove(node: any, data: any) {
+            if (data.children == undefined || data.children.length == 0) {
+                this.axios.post("/delDataSource", data).then(result => {
+                    if (result.data.code == 200) {
+                        this.loadTree();
+                    }
+                });
             } else {
-                return true;
+                (this as any).$message.error('请先删除子节点!');
             }
         }
 
-        allowDrag(draggingNode: any) {
-            return draggingNode.data.label.indexOf('三级 3-2-2') === -1;
+        showDialog(type: number) {
+            if (type == 0) {
+                this.currentData = {};
+            }
+            this.visibleMap.createDialogVisible = true;
         }
 
-    }
+        createDataSource(createType: number) {
+            switch (createType) {
+                case -1:
+                    this.visibleMap.createDialogVisible = false;
+                    this.visibleMap.folderFormVisible = true;
+                    this.folderForm = {
+                        id: "",
+                        name: "",
+                        type: "-1",
+                        parentId: "",
+                    };
+                    break;
+                case 0:
+                    this.visibleMap.createDialogVisible = false;
+                    this.visibleMap.mysqlFormVisible = true;
+                    this.oracleForm = {
+                        id: "",
+                        name: "",
+                        serverAddress: "",
+                        databaseName: "",
+                        driverClass: "oracle.jdbc.driver.OracleDriver",
+                        url: "",
+                        port: "",
+                        username: "",
+                        password: "",
+                        sId: "",
+                        type: "0",
+                        parentId: ""
+                    };
+                    break;
+                case 1:
+                    this.visibleMap.createDialogVisible = false;
+                    this.visibleMap.oracleFormVisible = true;
+                    this.mysqlForm = {
+                        id: "",
+                        name: "",
+                        serverAddress: "",
+                        databaseName: "",
+                        driverClass: "com.mysql.cj.jdbc.Driver",
+                        url: "",
+                        port: "",
+                        username: "",
+                        password: "",
+                        type: "0",
+                        parentId: ""
+                    };
+                    break;
+                case 2:
+                    this.visibleMap.createDialogVisible = false;
+                    this.visibleMap.excelFormVisible = true;
+                    break;
+                default:
+                    this.createDataSource(0);
+            }
+        }
 
-    class TreeData {
-        public id!: number;
-        public label!: string;
-        public name: string = "";
-        public url: string = "";
-        public port: string | number = "3306";
-        public username: string = "";
-        public password: string = "";
+        createFolder(form: string) {
+            if (this.folderForm.id == "" && this.currentData != null) {
+                this.folderForm.parentId = this.currentData.id;
+            }
+            const ref: any = this.$refs[form];
+            ref.validate((valid: boolean) => {
+                if (valid) {
+                    this.axios.post("/saveDataSource", this.folderForm).then(result => {
+                        if (result.data.code == 200) {
+                            this.visibleMap.folderFormVisible = false;
+                            this.loadTree();
+                        }
+                    });
+                }
+            });
+        }
 
-        public children: TreeData[] = [];
+        createdSqlDataSource(form: string) {
+            let f = this.mysqlForm;
+            if (form == "mysqlForm") {
+                f.url = "jdbc:mysql://" + this.mysqlForm.serverAddress + ":" + this.mysqlForm.port + "/" +
+                    this.mysqlForm.databaseName + "?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true";
 
-        public constructor(id: number, label: string) {
-            this.id = id;
-            this.label = label;
+                if (this.mysqlForm.id == "" && this.currentData != null) {
+                    this.mysqlForm.parentId = this.currentData.id;
+                }
+
+            } else {
+                f.url = "jdbc:oracle:thin:@" + this.oracleForm.serverAddress + ":" + this.oracleForm.port + ":" +
+                    this.oracleForm.databaseName;
+                f = this.oracleForm;
+
+                if (this.oracleForm.id == "" && this.currentData != null) {
+                    this.oracleForm.parentId = this.currentData.id;
+                }
+            }
+            const ref: any = this.$refs[form];
+            ref.validate((valid: boolean) => {
+                if (valid) {
+                    this.axios.post("/checkConnection", f).then(result => {
+                        if (result.data.code == 200) {
+                            this.visibleMap.oracleFormVisible = false;
+                            this.visibleMap.mysqlFormVisible = false;
+                            this.loadTree();
+                        } else {
+                            (this as any).$message.error('连接异常!');
+                        }
+                    });
+                }
+            });
+        }
+
+        beforeUpload(file: any) {
+            const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+            const isOver = file.size / 1024 / 1024 < 10;
+            if (!isExcel) {
+                (this as any).$message.error('上传只能是EXCEL文件!');
+                return false;
+            }
+
+            if (!isOver) {
+                (this as any).$message.error('上传只能是小于10M!');
+                return false;
+            }
+            return true;
+        }
+
+
+        handleNodeClick(data: any, node: any, ev: any) {
+            this.visibleMap.excelFormVisible = false;
+            this.visibleMap.folderFormVisible = false;
+            this.visibleMap.oracleFormVisible = false;
+            this.visibleMap.mysqlFormVisible = false;
+
+            switch (data.type) {
+                case -1:
+                    this.visibleMap.folderFormVisible = true;
+                    this.folderForm = data;
+                    break;
+                case 0:
+                    if (data.url.startsWith("jdbc:mysql")) {
+                        this.visibleMap.mysqlFormVisible = true;
+                        this.mysqlForm = data;
+                    } else {
+                        this.visibleMap.oracleFormVisible = true;
+                        this.oracleForm = data;
+                    }
+                    break;
+                case 1:
+                    this.visibleMap.excelFormVisible = true;
+                    this.excelForm = data;
+                    break;
+                default:
+            }
+
+
+        }
+
+        handleDrop(draggingNode: any, dropNode: any, dropType: any, ev: any) {
+
+            if (dropType == "inner") {
+                draggingNode.data.parentId = dropNode.data.id;
+            } else {
+                draggingNode.data.parentId = dropNode.data.parentId;
+            }
+
+            this.axios.post("/saveDataSource", draggingNode.data).then(result => {
+                if (result.data.code == 200) {
+                    this.loadTree();
+                }
+            });
+
+        }
+
+        allowDrop(draggingNode: any, dropNode: any, type: any) {
+            return dropNode.data.type == -1;
+        }
+
+        allowDrag(draggingNode: any) {
+            console.log(draggingNode);
+            return true;
         }
 
     }
@@ -214,5 +473,14 @@
         float: left;
         clear: right;
         width: 80%;
+    }
+
+    .custom-tree-node {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        padding-right: 8px;
     }
 </style>
