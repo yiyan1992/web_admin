@@ -27,122 +27,164 @@
         </div>
         <div id="right">
 
-            <!--文件夹 form-->
-            <el-form :model="folderForm" :rules="rules" label-width="100px" ref="folderForm"
-                     v-if="visibleMap.folderFormVisible">
-                <el-form-item label="文件夹名称" prop="name">
-                    <el-input v-model="folderForm.name"/>
-                </el-form-item>
-                <el-form-item>
-                    <el-button @click="createFolder('folderForm')">创建</el-button>
-                    <el-button @click="visibleMap.folderFormVisible = false">取 消</el-button>
-                </el-form-item>
-            </el-form>
+            <el-tabs type="card">
+                <el-tab-pane label="基本信息" name="first">
 
-            <!--MYSQL form-->
-            <el-form :model="mysqlForm" :rules="rules" label-width="100px"
-                     ref="mysqlForm" v-if="visibleMap.mysqlFormVisible">
-                <el-form-item label="数据源名称" prop="name">
-                    <el-input v-model="mysqlForm.name"/>
-                </el-form-item>
-                <el-form-item label="服务器" prop="serverAddress">
-                    <el-input v-model="mysqlForm.serverAddress"/>
-                </el-form-item>
-                <el-form-item label="数据库名称" prop="databaseName">
-                    <el-input v-model="mysqlForm.databaseName"/>
-                </el-form-item>
-                <el-form-item label="端口" prop="port">
-                    <el-input v-model="mysqlForm.port"/>
-                </el-form-item>
-                <el-form-item label="用户名" prop="username">
-                    <el-input v-model="mysqlForm.username"/>
-                </el-form-item>
-                <el-form-item label="密 码" prop="password">
-                    <el-input v-model="mysqlForm.password"/>
-                </el-form-item>
-                <el-form-item>
-                    <el-button @click="createdSqlDataSource('mysqlForm')">连接</el-button>
-                    <el-button @click="visibleMap.mysqlFormVisible=false">取消</el-button>
-                </el-form-item>
-            </el-form>
-
-            <!--ORACLE form-->
-            <el-form :model="oracleForm" :rules="rules" label-width="100px"
-                     ref="oracleForm" v-if="visibleMap.oracleFormVisible">
-                <el-form-item label="数据源名称" prop="name">
-                    <el-input v-model="oracleForm.name"/>
-                </el-form-item>
-                <el-form-item label="服务器" prop="serverAddress">
-                    <el-input v-model="oracleForm.serverAddress"/>
-                </el-form-item>
-                <el-form-item label="数据库名称" prop="databaseName">
-                    <el-input v-model="oracleForm.databaseName"/>
-                </el-form-item>
-                <el-form-item label="端口" prop="port">
-                    <el-input v-model="oracleForm.port"/>
-                </el-form-item>
-                <el-form-item label="用户名" prop="username">
-                    <el-input v-model="oracleForm.username"/>
-                </el-form-item>
-                <el-form-item label="密 码" prop="password">
-                    <el-input v-model="oracleForm.password"/>
-                </el-form-item>
-                <el-form-item label="SID" prop="password">
-                    <el-input v-model="oracleForm.sId"/>
-                </el-form-item>
-                <el-form-item>
-                    <el-button @click="createdSqlDataSource('oracleForm')">连接</el-button>
-                    <el-button @click="visibleMap.oracleFormVisible=false">取消</el-button>
-                </el-form-item>
-            </el-form>
-
-            <!--Excel form-->
-            <el-form :model="excelForm" :rules="rules" label-width="100px"
-                     ref="excelForm" v-if="visibleMap.excelFormVisible">
-                <el-form-item label="数据源名称" prop="name">
-                    <el-input v-model="excelForm.name"/>
-                </el-form-item>
-                <el-form-item>
-                    <el-upload
-                            :before-upload="beforeUpload"
-                            :file-list="fileList"
-                            accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                            action="http://aaa"
-                            class="upload-demo"
-                            drag
-                            multiple>
-                        <i class="el-icon-upload"></i>
-                        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-                        <div class="el-upload__tip" slot="tip">只能上传excel文件，且不超过10M</div>
-                    </el-upload>
-                </el-form-item>
-                <el-form-item>
-                    <el-button @click="createExcelSource('excelForm')">确 定</el-button>
-                    <el-button @click="visibleMap.excelFormVisible=false">取 消</el-button>
-                </el-form-item>
-            </el-form>
-
-        </div>
-
-        <el-dialog :visible.sync="visibleMap.createDialogVisible" center title="添加" width="30%">
-            <el-row>
-                <el-col :span="6">
-                    <el-button @click="createDataSource(-1)">文件夹</el-button>
-                </el-col>
-                <el-col :span="6">
-                    <el-button @click="createDataSource(0)">MYSQL</el-button>
-                </el-col>
-                <el-col :span="6">
-                    <el-button @click="createDataSource(1)">ORACLE</el-button>
-                </el-col>
-                <el-col :span="6">
-                    <el-button @click="createDataSource(2)">EXCEL</el-button>
-                </el-col>
-            </el-row>
-            <span class="dialog-footer" slot="footer">
+                    <el-dialog :visible.sync="visibleMap.createDialogVisible" center title="添加" width="40%">
+                        <el-row>
+                            <el-col :span="5">
+                                <el-button @click="createDataSource(-1)">文件夹</el-button>
+                            </el-col>
+                            <el-col :span="5">
+                                <el-button @click="createDataSource(0)">MYSQL</el-button>
+                            </el-col>
+                            <el-col :span="5">
+                                <el-button @click="createDataSource(1)">ORACLE</el-button>
+                            </el-col>
+                            <el-col :span="5">
+                                <el-button @click="createDataSource(2)">EXCEL</el-button>
+                            </el-col>
+                            <el-col :span="4">
+                                <el-button @click="createDataSource(3)">FTP</el-button>
+                            </el-col>
+                        </el-row>
+                        <span class="dialog-footer" slot="footer">
                 <el-button @click="visibleMap.createDialogVisible = false">取 消</el-button>
             </span>
-        </el-dialog>
+                    </el-dialog>
+                    <!--文件夹 form-->
+                    <el-form :model="folderForm" :rules="rules" label-width="100px" ref="folderForm"
+                             v-if="visibleMap.folderFormVisible">
+                        <el-form-item label="文件夹名称" prop="name">
+                            <el-input v-model="folderForm.name"/>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button @click="createFolder('folderForm')">创建</el-button>
+                            <el-button @click="visibleMap.folderFormVisible = false">取 消</el-button>
+                        </el-form-item>
+                    </el-form>
+
+                    <!--MYSQL form-->
+                    <el-form :model="mysqlForm" :rules="rules" label-width="100px"
+                             ref="mysqlForm" v-if="visibleMap.mysqlFormVisible">
+                        <el-form-item label="数据源名称" prop="name">
+                            <el-input v-model="mysqlForm.name"/>
+                        </el-form-item>
+                        <el-form-item label="服务器" prop="serverAddress">
+                            <el-input v-model="mysqlForm.serverAddress"/>
+                        </el-form-item>
+                        <el-form-item label="数据库名称" prop="databaseName">
+                            <el-input v-model="mysqlForm.databaseName"/>
+                        </el-form-item>
+                        <el-form-item label="端口" prop="port">
+                            <el-input v-model="mysqlForm.port"/>
+                        </el-form-item>
+                        <el-form-item label="用户名" prop="username">
+                            <el-input v-model="mysqlForm.username"/>
+                        </el-form-item>
+                        <el-form-item label="密 码" prop="password">
+                            <el-input v-model="mysqlForm.password"/>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button @click="createdSqlDataSource('mysqlForm')">连接</el-button>
+                            <el-button @click="visibleMap.mysqlFormVisible=false">取消</el-button>
+                        </el-form-item>
+                    </el-form>
+
+                    <!--ORACLE form-->
+                    <el-form :model="oracleForm" :rules="rules" label-width="100px"
+                             ref="oracleForm" v-if="visibleMap.oracleFormVisible">
+                        <el-form-item label="数据源名称" prop="name">
+                            <el-input v-model="oracleForm.name"/>
+                        </el-form-item>
+                        <el-form-item label="服务器" prop="serverAddress">
+                            <el-input v-model="oracleForm.serverAddress"/>
+                        </el-form-item>
+                        <el-form-item label="数据库名称" prop="databaseName">
+                            <el-input v-model="oracleForm.databaseName"/>
+                        </el-form-item>
+                        <el-form-item label="端口" prop="port">
+                            <el-input v-model="oracleForm.port"/>
+                        </el-form-item>
+                        <el-form-item label="用户名" prop="username">
+                            <el-input v-model="oracleForm.username"/>
+                        </el-form-item>
+                        <el-form-item label="密 码" prop="password">
+                            <el-input v-model="oracleForm.password"/>
+                        </el-form-item>
+                        <el-form-item label="SID" prop="password">
+                            <el-input v-model="oracleForm.sId"/>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button @click="createdSqlDataSource('oracleForm')">连接</el-button>
+                            <el-button @click="visibleMap.oracleFormVisible=false">取消</el-button>
+                        </el-form-item>
+                    </el-form>
+
+                    <!--Excel form-->
+                    <el-form :model="excelForm" :rules="rules" label-width="100px"
+                             ref="excelForm" v-if="visibleMap.excelFormVisible">
+                        <el-form-item label="数据源名称" prop="name">
+                            <el-input v-model="excelForm.name"/>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-upload
+                                    :before-upload="beforeUpload"
+                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                    :action="uploadAction()"
+                                    :headers="uploadHeader()"
+                                    class="upload-demo"
+                                    drag
+                                    :file-list="fileList"
+                                    :on-success="uploadSuccess"
+                                    :on-error="uploadError"
+                                    :before-remove="uploadBeforeRemove"
+                                    :on-remove="uploadRemove"
+                                    multiple>
+                                <i class="el-icon-upload"></i>
+                                <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+                                <div class="el-upload__tip" slot="tip">只能上传excel文件，且不超过10M</div>
+                            </el-upload>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button @click="createExcelSource('excelForm')">确 定</el-button>
+                            <el-button @click="visibleMap.excelFormVisible=false">取 消</el-button>
+                        </el-form-item>
+                    </el-form>
+
+                    <!--ftp form-->
+                    <el-form :model="ftpForm" :rules="rules" label-width="100px"
+                             ref="ftpForm" v-if="visibleMap.ftpFormVisible">
+                        <el-form-item label="数据源名称" prop="name">
+                            <el-input v-model="ftpForm.name"/>
+                        </el-form-item>
+                        <el-form-item label="服务器" prop="serverAddress">
+                            <el-input v-model="ftpForm.serverAddress"/>
+                        </el-form-item>
+                        <el-form-item label="文件/文件夹名称" prop="databaseName">
+                            <el-input v-model="ftpForm.databaseName"/>
+                        </el-form-item>
+                        <el-form-item label="端口" prop="port">
+                            <el-input v-model="ftpForm.port"/>
+                        </el-form-item>
+                        <el-form-item label="用户名" prop="username">
+                            <el-input v-model="ftpForm.username"/>
+                        </el-form-item>
+                        <el-form-item label="密 码" prop="password">
+                            <el-input v-model="ftpForm.password"/>
+                        </el-form-item>
+                        <el-form-item>
+                            <el-button @click="createFtp('ftpForm')">连接</el-button>
+                            <el-button @click="visibleMap.ftpFormVisible=false">取消</el-button>
+                        </el-form-item>
+                    </el-form>
+
+                </el-tab-pane>
+                <el-tab-pane label="表信息" name="second">配置管理</el-tab-pane>
+                <el-tab-pane label="操作记录" name="third">角色管理</el-tab-pane>
+            </el-tabs>
+        </div>
+
     </div>
 
 </template>
@@ -172,6 +214,7 @@
             mysqlFormVisible: false,
             oracleFormVisible: false,
             excelFormVisible: false,
+            ftpFormVisible: false,
             createDialogVisible: false,
         };
 
@@ -218,10 +261,24 @@
             url: "",
             type: "1",
             parentId: "",
+            databaseName: "",
+            username: ""
         };
 
-        private fileList = [];
+        private ftpForm = {
+            id: "",
+            name: "",
+            serverAddress: "",
+            databaseName: "",
+            url: "",
+            port: "",
+            username: "",
+            password: "",
+            type: "2",
+            parentId: ""
+        };
 
+        private fileList: UploadFile[] = [];
 
         private rules = {
             name: [
@@ -280,6 +337,7 @@
         }
 
         createDataSource(createType: number) {
+            this.hideForm();
             switch (createType) {
                 case -1:
                     this.visibleMap.createDialogVisible = false;
@@ -294,24 +352,6 @@
                 case 0:
                     this.visibleMap.createDialogVisible = false;
                     this.visibleMap.mysqlFormVisible = true;
-                    this.oracleForm = {
-                        id: "",
-                        name: "",
-                        serverAddress: "",
-                        databaseName: "",
-                        driverClass: "oracle.jdbc.driver.OracleDriver",
-                        url: "",
-                        port: "",
-                        username: "",
-                        password: "",
-                        sId: "",
-                        type: "0",
-                        parentId: ""
-                    };
-                    break;
-                case 1:
-                    this.visibleMap.createDialogVisible = false;
-                    this.visibleMap.oracleFormVisible = true;
                     this.mysqlForm = {
                         id: "",
                         name: "",
@@ -326,12 +366,55 @@
                         parentId: ""
                     };
                     break;
+                case 1:
+                    this.visibleMap.createDialogVisible = false;
+                    this.visibleMap.oracleFormVisible = true;
+                    this.oracleForm = {
+                        id: "",
+                        name: "",
+                        serverAddress: "",
+                        databaseName: "",
+                        driverClass: "com.mysql.cj.jdbc.Driver",
+                        url: "",
+                        port: "",
+                        username: "",
+                        password: "",
+                        sId: "",
+                        type: "0",
+                        parentId: ""
+                    };
+                    break;
                 case 2:
                     this.visibleMap.createDialogVisible = false;
                     this.visibleMap.excelFormVisible = true;
+                    this.excelForm = {
+                        id: "",
+                        name: "",
+                        url: "",
+                        type: "1",
+                        parentId: "",
+                        databaseName: "",
+                        username: ""
+                    };
+                    break;
+                case 3:
+                    this.visibleMap.createDialogVisible = false;
+                    this.visibleMap.ftpFormVisible = true;
+                    this.fileList = [];
+                    this.ftpForm = {
+                        id: "",
+                        name: "",
+                        serverAddress: "",
+                        databaseName: "",
+                        url: "",
+                        port: "",
+                        username: "",
+                        password: "",
+                        type: "2",
+                        parentId: ""
+                    };
                     break;
                 default:
-                    this.createDataSource(0);
             }
         }
 
@@ -387,7 +470,84 @@
             });
         }
 
+        createExcelSource(form: string) {
+            this.hideForm();
+            if (this.excelForm.id == "" && this.currentData != null) {
+                this.excelForm.parentId = this.currentData.id;
+            }
+            const f = this.excelForm;
+            if (this.fileList.length == 0) {
+                (this as any).$message.error("请先上传文件!");
+                return;
+            }
+            let pathStr = "";
+            let nameStr = "";
+            let sizeStr = "";
+            for (let i = 0; i < this.fileList.length; i++) {
+                pathStr += (this.fileList[i] as any).url + ",";
+                nameStr += (this.fileList[i] as any).name + ",";
+                sizeStr += (this.fileList[i] as any).size + ",";
+            }
+            f.url = pathStr;
+            f.databaseName = nameStr;
+            f.username = sizeStr;
+            const ref: any = this.$refs[form];
+            ref.validate((valid: boolean) => {
+                if (valid) {
+                    this.axios.post("/saveDataSource", f).then(result => {
+                        if (result.data.code == 200) {
+                            this.visibleMap.oracleFormVisible = false;
+                            this.visibleMap.excelFormVisible = false;
+                            this.loadTree();
+                        } else {
+                            (this as any).$message.error('创建成功!');
+                        }
+                    });
+                }
+            });
+        }
+
+
+        createFtp(form: string) {
+            if (this.ftpForm.id == "" && this.currentData != null) {
+                this.ftpForm.parentId = this.currentData.id;
+            }
+            const ref: any = this.$refs[form];
+            ref.validate((valid: boolean) => {
+                if (valid) {
+                    this.axios.post("/checkConnection", this.ftpForm).then(result => {
+                        if (result.data.code == 200) {
+                            this.visibleMap.ftpFormVisible = false;
+                            this.loadTree();
+                        }
+                    });
+                }
+            });
+        }
+
+        uploadAction() {
+            return "http://127.0.0.1:80/data/source/uploadFile";
+        }
+
+        uploadHeader() {
+            return {
+                Authorization: "Bearer aaa"
+            };
+        }
+
         beforeUpload(file: any) {
+            let flag = true;
+
+            this.fileList.forEach((e) => {
+                if (e.name == file.name && e.size == file.size) {
+                    flag = false;
+                    (this as any).$message.warning("文件已存在!");
+                }
+            });
+
+            if (!flag) {
+                return false;
+            }
             const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
             const isOver = file.size / 1024 / 1024 < 10;
             if (!isExcel) {
@@ -402,13 +562,60 @@
             return true;
         }
 
+        transformFileList(fileList: any) {
+            this.fileList = [];
+            for (var i = 0; i < fileList.length; i++) {
+                this.fileList.push({
+                    name: fileList[i].name,
+                    url: fileList[i].response.data,
+                    size: fileList[i].size
+                });
+            }
+        }
 
-        handleNodeClick(data: any, node: any, ev: any) {
+        uploadSuccess(response: any, file: any, fileList: any) {
+            this.transformFileList(fileList);
+        }
+
+        uploadError(err: any, file: any, fileList: any) {
+            (this as any).$message.error("文件上传失败")
+            this.transformFileList(fileList);
+        }
+
+        uploadBeforeRemove(file: any, fileList: any) {
+            let t: any = this;
+            t.$confirm('此操作将永久删除服务器中的文件, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+            }).catch(() => {
+                t.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });
+            });
+        }
+
+        uploadRemove(file: any, fileList: any) {
+            this.transformFileList(fileList);
+            const fileName: string = file.name;
+            let number = fileName.lastIndexOf(".");
+            this.axios.post("delUploadFile/" + file.size + fileName.substring(0, number)
+                + "/" + fileName.substring(number + 1));
+        }
+
+        hideForm() {
             this.visibleMap.excelFormVisible = false;
             this.visibleMap.folderFormVisible = false;
             this.visibleMap.oracleFormVisible = false;
             this.visibleMap.mysqlFormVisible = false;
+            this.visibleMap.ftpFormVisible = false;
+        }
 
+
+        handleNodeClick(data: any, node: any, ev: any) {
+            this.hideForm();
             switch (data.type) {
                 case -1:
                     this.visibleMap.folderFormVisible = true;
@@ -426,6 +633,26 @@
                 case 1:
                     this.visibleMap.excelFormVisible = true;
                     this.excelForm = data;
+
+                    var str1 = this.excelForm.url.split(",");
+                    var str2 = this.excelForm.databaseName.split(",");
+                    var str3 = this.excelForm.username.split(",");
+
+                    this.fileList = [];
+                    for (var i = 0; i < str1.length; i++) {
+                        if (str1[i] == "") {
+                            continue;
+                        }
+                        this.fileList.push({
+                            name: str2[i],
+                            url: str1[i],
+                            size: str3[i]
+                        });
+                    }
+                    break;
+                case 2:
+                    this.visibleMap.ftpFormVisible = true;
+                    this.ftpForm = data;
                     break;
                 default:
             }
@@ -454,13 +681,17 @@
         }
 
         allowDrag(draggingNode: any) {
-            console.log(draggingNode);
             return true;
         }
 
     }
 
+    class UploadFile {
+        public name!: string;
+        public url!: string;
+        public size!: string;
 
+    }
 </script>
 
 <style scoped>
