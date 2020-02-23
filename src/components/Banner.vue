@@ -6,7 +6,7 @@
             </el-col>
             <el-col :span="1" :offset="17">
                 <el-badge :value="messageNumber" class="item" id="msg">
-                    <el-button icon="el-icon-message-solid" circle size="small"></el-button>
+                    <el-button icon="el-icon-message-solid" circle></el-button>
                 </el-badge>
             </el-col>
             <el-col :span="1">
@@ -22,6 +22,9 @@
                 </el-dropdown>
             </el-col>
         </el-row>
+        <el-divider/>
+
+
     </div>
 </template>
 

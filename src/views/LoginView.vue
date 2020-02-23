@@ -9,6 +9,9 @@
                 <el-input show-password v-model="form.password"/>
             </el-form-item>
             <el-form-item>
+                <el-checkbox v-model="form.remember">记住登录</el-checkbox>
+            </el-form-item>
+            <el-form-item>
                 <el-button type="primary" @click="submit('form')">登陆</el-button>
             </el-form-item>
         </el-form>
@@ -18,14 +21,12 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
+    import {Login} from '@/entity/Login'
 
     @Component
-    export default class Login extends Vue {
+    export default class LoginView extends Vue {
 
-        private form = {
-            username: "",
-            password: ""
-        };
+        private form: Login = new Login();
 
         private rules = {
             username: [
@@ -39,7 +40,12 @@
             const ref: any = this.$refs[form];
             ref.validate((valid: boolean) => {
                 if (valid) {
-                    console.log(this.form.username)
+                    this.axios.post("login", this.form).then(result => {
+                        if (result.data.code == 200) {
+                            localStorage.setItem("Authorization", result.data.data);
+                            this.$router.replace("/");
+                        }
+                    });
                 }
             });
         }

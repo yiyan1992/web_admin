@@ -20,8 +20,10 @@ const _axios = axios.create(config);
 
 _axios.interceptors.request.use(
     function (config) {
-        // Do something before request is sent
-        config.headers['Authorization'] = PREFIX + "aaa";
+        let item = localStorage.getItem("Authorization");
+        if (item != null && item.length > 0) {
+            config.headers['Authorization'] = PREFIX + item;
+        }
         return config;
     },
     function (error) {
