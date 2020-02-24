@@ -29,29 +29,6 @@
 
             <el-tabs type="card">
                 <el-tab-pane label="基本信息" name="first">
-
-                    <el-dialog :visible.sync="visibleMap.createDialogVisible" center title="添加" width="40%">
-                        <el-row>
-                            <el-col :span="5">
-                                <el-button @click="createDataSource(-1)">文件夹</el-button>
-                            </el-col>
-                            <el-col :span="5">
-                                <el-button @click="createDataSource(0)">MYSQL</el-button>
-                            </el-col>
-                            <el-col :span="5">
-                                <el-button @click="createDataSource(1)">ORACLE</el-button>
-                            </el-col>
-                            <el-col :span="5">
-                                <el-button @click="createDataSource(2)">EXCEL</el-button>
-                            </el-col>
-                            <el-col :span="4">
-                                <el-button @click="createDataSource(3)">FTP</el-button>
-                            </el-col>
-                        </el-row>
-                        <span class="dialog-footer" slot="footer">
-                <el-button @click="visibleMap.createDialogVisible = false">取 消</el-button>
-            </span>
-                    </el-dialog>
                     <!--文件夹 form-->
                     <el-form :model="folderForm" :rules="rules" label-width="100px" ref="folderForm"
                              v-if="visibleMap.folderFormVisible">
@@ -185,6 +162,28 @@
             </el-tabs>
         </div>
 
+        <el-dialog :visible.sync="visibleMap.createDialogVisible" center title="添加" width="40%">
+            <el-row>
+                <el-col :span="5">
+                    <el-button @click="createDataSource(-1)">文件夹</el-button>
+                </el-col>
+                <el-col :span="5">
+                    <el-button @click="createDataSource(0)">MYSQL</el-button>
+                </el-col>
+                <el-col :span="5">
+                    <el-button @click="createDataSource(1)">ORACLE</el-button>
+                </el-col>
+                <el-col :span="5">
+                    <el-button @click="createDataSource(2)">EXCEL</el-button>
+                </el-col>
+                <el-col :span="4">
+                    <el-button @click="createDataSource(3)">FTP</el-button>
+                </el-col>
+            </el-row>
+            <span class="dialog-footer" slot="footer">
+                <el-button @click="visibleMap.createDialogVisible = false">取 消</el-button>
+            </span>
+        </el-dialog>
     </div>
 
 </template>
@@ -531,7 +530,7 @@
 
         uploadHeader() {
             return {
-                Authorization: "Bearer "+localStorage.getItem("Authorization")
+                Authorization: "Bearer " + localStorage.getItem("Authorization")
             };
         }
 

@@ -11,6 +11,7 @@
                     <el-menu-item index="/about">选项2</el-menu-item>
                     <el-menu-item index="/dataSource">数据源</el-menu-item>
                     <el-menu-item index="/sysRole">角色</el-menu-item>
+                    <el-menu-item index="/sysMenu">菜单</el-menu-item>
                 </el-submenu>
             </el-menu>
         </div>

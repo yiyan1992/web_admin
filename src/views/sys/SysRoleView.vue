@@ -63,6 +63,7 @@
 
     import {SysRole, SysMenu} from '../../entity/Sys';
     import {Result, JpaPage} from '../../entity/Base';
+    import {Message, MessageBox} from "element-ui";
 
     @Component
     export default class SysRoleView extends Vue {
@@ -106,7 +107,7 @@
         }
 
         toDelete(index: number, row: any) {
-            (this as any).$confirm('此操作将删除该角色, 是否继续?', '提示', {
+            MessageBox.confirm('此操作将删除该角色, 是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
@@ -114,30 +115,29 @@
                 this.axios.post("sys/role/deleteById/" + row.id).then(result => {
                     let v = new Result(result);
                     if (v.code == 200) {
-                        (this as any).$message({
-                            type: 'success',
-                            message: '删除成功!'
-                        });
+                        Message.success("删除成功!");
                         this.searchForm("form");
                     }
                 });
             }).catch(() => {
-                (this as any).$message({
-                    type: 'info',
-                    message: '已取消删除'
-                });
+                Message.info("已取消删除");
             });
         }
 
         dialogSave(form: string) {
-            this.axios.post("sys/role/save", this.dialog.form).then(result => {
-                let v = new Result(result);
-                if (v.code == 200) {
-                    this.dialog.show = false;
-                    this.searchForm("form");
-                    (this as any).$message.success('保存成功!');
-                } else {
-                    (this as any).$message.error('保存失败!');
+            const ref: any = this.$refs[form];
+            ref.validate((valid: boolean) => {
+                if (valid) {
+                    this.axios.post("sys/role/save", this.dialog.form).then(result => {
+                        let v = new Result(result);
+                        if (v.code == 200) {
+                            this.dialog.show = false;
+                            this.searchForm("form");
+                            Message.success('保存成功!');
+                        } else {
+                            Message.error('保存失败!');
+                        }
+                    });
                 }
             });
         }

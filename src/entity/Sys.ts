@@ -1,9 +1,11 @@
 import {DataPage} from "@/entity/Base";
 
-export class SysMenu extends DataPage {
+export class SysMenu {
     public id!: bigint;
 
     public name!: string;
+
+    public button: boolean = false;
 
     public url!: string;
 
@@ -11,7 +13,9 @@ export class SysMenu extends DataPage {
 
     public description!: string;
 
-    public parent!: SysMenu;
+    public parentId!: bigint | null;
+
+    public children: SysMenu[] = [];
 }
 
 export class SysRole extends DataPage {

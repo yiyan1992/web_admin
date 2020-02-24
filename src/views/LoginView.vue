@@ -22,6 +22,7 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
     import {Login} from '@/entity/Login'
+    import {Message} from "element-ui";
 
     @Component
     export default class LoginView extends Vue {
@@ -42,6 +43,7 @@
                 if (valid) {
                     this.axios.post("login", this.form).then(result => {
                         if (result.data.code == 200) {
+                            Message.success("登录成功!");
                             localStorage.setItem("Authorization", result.data.data);
                             this.$router.replace("/");
                         }
