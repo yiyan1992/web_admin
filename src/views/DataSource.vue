@@ -531,7 +531,7 @@
 
         uploadHeader() {
             return {
-                Authorization: "Bearer aaa"
+                Authorization: "Bearer "+localStorage.getItem("Authorization")
             };
         }
 
