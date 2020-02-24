@@ -55,17 +55,36 @@
                 <el-button type="primary" @click="dialogSave">确 定</el-button>
             </div>
         </el-dialog>
+
+        <el-dialog :visible.sync="selectMenu.show">
+            <div slot="title" class="header-title">
+                <span> 选择菜单</span>
+            </div>
+            <select-menu v-bind:role-id="selectMenu.roleId" ref="selectMenu"/>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="selectMenu.show = false">取 消</el-button>
+                <el-button type="primary" @click="menuSelect">确 定</el-button>
+            </div>
+        </el-dialog>
+
+
     </div>
 </template>
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
 
-    import {SysRole, SysMenu} from '../../entity/Sys';
-    import {Result, JpaPage} from '../../entity/Base';
+    import {SysRole, SysMenu} from '@/entity/Sys';
+    import {Result, JpaPage} from '@/entity/Base';
     import {Message, MessageBox} from "element-ui";
+    import SelectMenu from "@/components/SelectMenu.vue";
 
-    @Component
+    @Component({
+        components: {
+            SelectMenu
+        }
+    })
+
     export default class SysRoleView extends Vue {
 
         private form: SysRole = new SysRole();
@@ -87,6 +106,11 @@
             }
         };
 
+        private selectMenu = {
+            roleId: null,
+            show: false
+        }
+
         created() {
             this.searchForm("form");
         }
@@ -104,6 +128,17 @@
                 this.dialog.form = v.data;
             });
             this.dialog.show = true;
+        }
+
+        toUpdateMenu(index: number, row: any) {
+            this.selectMenu.show = true;
+            this.selectMenu.roleId = row.id;
+        }
+
+        menuSelect() {
+            let selectMenu: any = this.$refs.selectMenu;
+            selectMenu.submit();
+            this.selectMenu.show = false;
         }
 
         toDelete(index: number, row: any) {

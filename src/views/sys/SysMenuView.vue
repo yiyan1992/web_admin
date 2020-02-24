@@ -58,7 +58,6 @@
     import {SysMenu} from '../../entity/Sys';
     import {Result, JpaPage} from '../../entity/Base';
     import {Message, MessageBox} from "element-ui";
-    import {Form} from "element-ui";
 
     @Component
     export default class SysMenuView extends Vue {
@@ -83,10 +82,9 @@
 
         loadTree() {
             this.axios.get("sys/menu/findForTree", {}).then((result) => {
-                this.treeData = result.data.data;
                 let v = new Result(result);
                 if (v.code == 200) {
-                    console.log("##");
+                    this.treeData = v.data;
                 } else {
                     Message.error("加载失败!");
                 }
