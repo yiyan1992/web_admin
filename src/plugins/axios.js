@@ -23,7 +23,7 @@ const _axios = axios.create(config);
 
 _axios.interceptors.request.use(
     function (config) {
-        let item = localStorage.getItem("Authorization");
+        let item = sessionStorage.getItem("Authorization");
         if (item != null && item.length > 0) {
             config.headers['Authorization'] = PREFIX + item;
         }
@@ -39,12 +39,12 @@ _axios.interceptors.request.use(
 _axios.interceptors.response.use(
     function (response) {
         let v = new Result(response);
-        if (v.code == 400) {
-            localStorage.removeItem("Authorization");
+        if (v.code === 400) {
+            sessionStorage.removeItem("Authorization");
             router.replace("/login").then(r => {
                 Message.warning("登录已过期,请重新登录!");
             });
-        } else if (v.code == 500) {
+        } else if (v.code === 500) {
             Message.warning(v.msg);
         }
         return response;

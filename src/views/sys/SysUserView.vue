@@ -35,6 +35,7 @@
                     <el-button @click="toUpdate(scope.$index, scope.row)" type="text">编辑</el-button>
                     <el-button @click="toUpdateRole(scope.$index, scope.row)" type="text">角色</el-button>
                     <el-button @click.prevent="toDelete(scope.$index, scope.row)" type="text">删除</el-button>
+                    <el-button @click.prevent="toRestPwd(scope.$index, scope.row)" type="text">重置密码</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -184,6 +185,24 @@
                 });
             }).catch(() => {
                 Message.info("已取消删除");
+            });
+        }
+
+        toRestPwd(index: number, row: any) {
+            MessageBox.confirm('此操作将重置用户密码为手机号后六位, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.axios.post("sys/user/restPwd/" + row.id).then(result => {
+                    let v = new Result(result);
+                    if (v.code == 200) {
+                        Message.success("重置成功!");
+                        this.searchForm("form");
+                    }
+                });
+            }).catch(() => {
+                Message.info("已取消重置!");
             });
         }
 

@@ -2,7 +2,7 @@
     <div id="dataSource">
 
         <div id="left">
-            <span>数据连接 </span>
+            <span>数据连接</span>
             <el-button @click="showDialog(0)" icon="el-icon-plus" size="mini"/>
             <el-tree
                     :allow-drag="allowDrag"
@@ -27,7 +27,7 @@
         </div>
         <div id="right">
 
-            <el-tabs type="card">
+            <el-tabs type="card" value="first">
                 <el-tab-pane label="基本信息" name="first">
                     <!--文件夹 form-->
                     <el-form :model="folderForm" :rules="rules" label-width="100px" ref="folderForm"
@@ -130,7 +130,7 @@
                     </el-form>
 
                     <!--ftp form-->
-                    <el-form :model="ftpForm" :rules="rules" label-width="100px"
+                    <el-form :model="ftpForm" :rules="rules" label-width="200px"
                              ref="ftpForm" v-if="visibleMap.ftpFormVisible">
                         <el-form-item label="数据源名称" prop="name">
                             <el-input v-model="ftpForm.name"/>
@@ -530,7 +530,7 @@
 
         uploadHeader() {
             return {
-                Authorization: "Bearer " + localStorage.getItem("Authorization")
+                Authorization: "Bearer " + sessionStorage.getItem("Authorization")
             };
         }
 

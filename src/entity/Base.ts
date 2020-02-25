@@ -1,5 +1,3 @@
-import {AxiosResponse} from "axios";
-
 export class DataPage {
 
     public page: number = 0;

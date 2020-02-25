@@ -44,7 +44,7 @@
                     this.axios.post("login", this.form).then(result => {
                         if (result.data.code == 200) {
                             Message.success("登录成功!");
-                            localStorage.setItem("Authorization", result.data.data);
+                            sessionStorage.setItem("Authorization", result.data.data);
                             this.$router.replace("/");
                         }
                     });
