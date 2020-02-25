@@ -27,7 +27,7 @@
         </div>
         <div id="right">
 
-            <el-tabs type="card" value="first">
+            <el-tabs type="card" value="first" stretch @tab-click="tabClick">
                 <el-tab-pane label="基本信息" name="first">
                     <!--文件夹 form-->
                     <el-form :model="folderForm" :rules="rules" label-width="100px" ref="folderForm"
@@ -158,7 +158,14 @@
 
                 </el-tab-pane>
                 <el-tab-pane label="表信息" name="second">配置管理</el-tab-pane>
-                <el-tab-pane label="操作记录" name="third">角色管理</el-tab-pane>
+                <el-tab-pane label="操作记录" name="third">
+                    <el-table stripe :data="operationLogTable" row-key="id">
+                        <el-table-column prop="createTime" label="时间" sortable/>
+                        <el-table-column prop="user.name" label="操作着"/>
+                        <el-table-column prop="user.email" label="账号"/>
+                        <el-table-column prop="title" label="操作记录"/>
+                    </el-table>
+                </el-tab-pane>
             </el-tabs>
         </div>
 
@@ -191,9 +198,13 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
+    import {DataSourceLog} from "@/entity/DataSource";
+    import {Result} from "@/entity/Base";
 
     @Component
     export default class DataSource extends Vue {
+
+        private operationLogTable: DataSourceLog[] = [];
 
         //树数据
         private treeData = [];
@@ -563,7 +574,7 @@
 
         transformFileList(fileList: any) {
             this.fileList = [];
-            for (var i = 0; i < fileList.length; i++) {
+            for (let i = 0; i < fileList.length; i++) {
                 this.fileList.push({
                     name: fileList[i].name,
                     url: fileList[i].response.data,
@@ -614,6 +625,7 @@
 
 
         handleNodeClick(data: any, node: any, ev: any) {
+            this.currentData = data;
             this.hideForm();
             switch (data.type) {
                 case -1:
@@ -681,6 +693,18 @@
 
         allowDrag(draggingNode: any) {
             return true;
+        }
+
+        tabClick(val: any) {
+            if (val.name == "third") {
+                this.axios.post("findAll7DaysLog/" + this.currentData.id).then(result => {
+                    let v = new Result(result);
+                    if (v.code == 200) {
+                        this.operationLogTable = v.data;
+                    }
+
+                });
+            }
         }
 
     }
