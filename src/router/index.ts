@@ -5,6 +5,7 @@ import DataSource from '@/views/DataSource.vue'
 import LoginView from '@/views/LoginView.vue'
 import SysRoleView from "@/views/sys/SysRoleView.vue";
 import SysMenuView from "@/views/sys/SysMenuView.vue";
+import SysUserView from "@/views/sys/SysUserView.vue";
 
 Vue.use(VueRouter);
 
@@ -47,6 +48,10 @@ const routes = [
                 path: '/sysMenu',
                 name: 'sysMenu',
                 component: SysMenuView
+            },{
+                path: '/sysUser',
+                name: 'sysUser',
+                component: SysUserView
             },
         ]
     }

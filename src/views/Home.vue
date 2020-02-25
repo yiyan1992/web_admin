@@ -24,7 +24,7 @@
             if (item != null && item.length > 0) {
                 this.axios.get("checkToken").then(result => {
                     if (result.data.code == 200) {
-                        console.log("#####")
+                        console.log()
                     } else {
                         this.$router.replace("/login")
                     }

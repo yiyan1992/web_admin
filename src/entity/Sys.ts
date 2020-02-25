@@ -40,5 +40,12 @@ export class SysUser extends DataPage {
 
     public email!: string;
 
+    public phone!: string;
+
+    public lastLoginTime!: Date;
+
+    public lastLoginIp!: string;
+
+    public roles!: Array<SysRole>;
 
 }
