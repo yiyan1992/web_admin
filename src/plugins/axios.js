@@ -2,6 +2,9 @@
 
 import Vue from 'vue';
 import axios from "axios";
+import router from "../router";
+import {Result} from "../entity/Base";
+import {Message, MessageBox, Select} from "element-ui";
 
 // Full config:  https://github.com/axios/axios#request-config
 // axios.defaults.baseURL = process.env.baseURL || process.env.apiUrl || '';
@@ -35,6 +38,15 @@ _axios.interceptors.request.use(
 // Add a response interceptor
 _axios.interceptors.response.use(
     function (response) {
+        let v = new Result(response);
+        if (v.code == 400) {
+            localStorage.removeItem("Authorization");
+            router.replace("/login").then(r => {
+                Message.warning("登录已过期,请重新登录!");
+            });
+        } else if (v.code == 500) {
+            Message.warning(v.msg);
+        }
         return response;
     },
     function (error) {

@@ -42,13 +42,16 @@
                 let v = new Result(result);
                 if (v.code == 200) {
                     this.treeData = v.data;
+                    this.loadSelect();
                 } else {
                     Message.error("加载失败!");
                 }
             });
+        }
+
+        loadSelect() {
             if (this.roleId > 0) {
                 this.axios.get("sys/menu/findAllByRoleId/" + this.roleId, {timeout: 500}).then((result) => {
-                    this.treeData = result.data.data;
                     let v = new Result(result);
                     if (v.code == 200) {
                         let arr: SysMenu[] = v.data
