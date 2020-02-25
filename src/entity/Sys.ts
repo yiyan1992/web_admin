@@ -32,5 +32,13 @@ export class SysRole extends DataPage {
 
 export class SysUser extends DataPage {
 
+    public id!: bigint;
+
+    public name!: string;
+
+    public username!: string;
+
+    public email!: string;
+
 
 }
