@@ -754,7 +754,7 @@
         }
 
         tabClick(id: any) {
-            this.axios.post("findAll7DaysLog/"+id).then(result => {
+            this.axios.post("findAll7DaysLog/" + id).then(result => {
                 let v = new Result(result);
                 if (v.code == 200) {
                     this.operationLogTable = v.data;
@@ -794,6 +794,9 @@
         //默认抽取方式
         private defaultUpdateType = 0;
 
+        //更新类型
+        private updateType = 0;
+
         /**
          * 抽取方式选择弹窗
          */
@@ -832,7 +835,7 @@
                 this.axios.post("delete", {'name': row.tableName, 'dataSourceId': 12}).then((result) => {
                     if (result.data.code == 200) {
                         t.$message.success("删除成功");
-                        this.getDataSourceTable();
+                        this.getDataSourceTable(this.currentData.id);
                     } else {
                         t.$message.error(result.data.msg);
                     }
@@ -860,7 +863,7 @@
             }).then((result) => {
                 if (result.data.code == 200) {
                     t.$message.success("数据抽取成功");
-                    this.getDataSourceTable();
+                    this.getDataSourceTable(row.id);
                 } else {
                     t.$message.error(result.data.msg);
                 }
