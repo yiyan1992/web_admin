@@ -18,9 +18,10 @@
                       <span><span class="el-icon-folder" v-if="data.type==-1"/>
                           <span class="el-icon-tickets" v-if="data.type!=-1"/> {{ data.name }}</span>
                     <span>
-                      <el-button @click="() => addDataSource(node,data)" style="font-size: 20px;" type="text"
+                      <el-button @click.stop="() => addDataSource(node,data)" style="font-size: 20px;" type="text"
                                  v-if="data.type==-1">+</el-button>
-                      <el-button @click="() => remove(node, data)" style="font-size: 20px;" type="text">-</el-button>
+                      <el-button @click.stop="() => remove(node, data)" style="font-size: 20px;"
+                                 type="text">-</el-button>
                     </span>
                   </span>
             </el-tree>
@@ -391,7 +392,6 @@
         //创建文件夹保存
         createFolder(form: string) {
             if (this.currentData.id > 0) {
-                this.dataSourceForm.id = null;
                 this.dataSourceForm.parentId = this.currentData.id
             }
             const ref: any = this.$refs[form];
@@ -408,22 +408,22 @@
         }
 
         createdSqlDataSource(form: string) {
-            let f = this.mysqlForm;
+            let f = this.dataSourceForm;
             if (form == "mysqlForm") {
-                f.url = "jdbc:mysql://" + this.mysqlForm.serverAddress + ":" + this.mysqlForm.port + "/" +
-                    this.mysqlForm.databaseName + "?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true";
+                f.url = "jdbc:mysql://" + this.dataSourceForm.serverAddress + ":" + this.dataSourceForm.port + "/" +
+                    this.dataSourceForm.databaseName + "?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true";
 
-                if (this.mysqlForm.id == "" && this.currentData != null) {
-                    this.mysqlForm.parentId = this.currentData.id;
+                if (this.dataSourceForm.id > 0 && this.currentData != null) {
+                    this.dataSourceForm.parentId = this.currentData.id;
                 }
 
             } else {
-                f.url = "jdbc:oracle:thin:@" + this.oracleForm.serverAddress + ":" + this.oracleForm.port + ":" +
-                    this.oracleForm.databaseName;
-                f = this.oracleForm;
+                f.url = "jdbc:oracle:thin:@" + this.dataSourceForm.serverAddress + ":" + this.dataSourceForm.port + ":" +
+                    this.dataSourceForm.databaseName;
+                f = this.dataSourceForm;
 
-                if (this.oracleForm.id == "" && this.currentData != null) {
-                    this.oracleForm.parentId = this.currentData.id;
+                if (this.dataSourceForm.id > 0 && this.currentData != null) {
+                    this.dataSourceForm.parentId = this.currentData.id;
                 }
             }
             const ref: any = this.$refs[form];
@@ -444,10 +444,10 @@
 
         createExcelSource(form: string) {
             this.hideForm();
-            if (this.excelForm.id == "" && this.currentData != null) {
-                this.excelForm.parentId = this.currentData.id;
+            if (this.dataSourceForm.id > 0 && this.currentData != null) {
+                this.dataSourceForm.parentId = this.currentData.id;
             }
-            const f = this.excelForm;
+            const f = this.dataSourceForm;
             if (this.fileList.length == 0) {
                 (this as any).$message.error("请先上传文件!");
                 return;
@@ -481,13 +481,13 @@
 
 
         createFtp(form: string) {
-            if (this.ftpForm.id == "" && this.currentData != null) {
-                this.ftpForm.parentId = this.currentData.id;
+            if (this.dataSourceForm.id > 0 && this.currentData != null) {
+                this.dataSourceForm.parentId = this.currentData.id;
             }
             const ref: any = this.$refs[form];
             ref.validate((valid: boolean) => {
                 if (valid) {
-                    this.axios.post("/checkConnection", this.ftpForm).then(result => {
+                    this.axios.post("/checkConnection", this.dataSourceForm).then(result => {
                         if (result.data.code == 200) {
                             this.visibleMap.ftpFormVisible = false;
                             this.loadTree();
