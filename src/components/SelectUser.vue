@@ -81,9 +81,9 @@
          * 处理选中用户
          * @param val
          */
-        handleSelectionChange(val: any) {
+        handleSelectionChange(val: Array<any>) {
             this.selectKeys = [];
-            val.flatMap(e => {
+            val.forEach(e => {
                 this.selectKeys.push(e.id);
             })
         }
