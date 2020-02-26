@@ -27,7 +27,7 @@
         </div>
         <div id="right">
 
-            <el-tabs type="card" value="first" stretch @tab-click="tabClick">
+            <el-tabs type="card" value="first" stretch>
                 <el-tab-pane label="基本信息" name="first">
                     <!--文件夹 form-->
                     <el-form :model="folderForm" :rules="rules" label-width="100px" ref="folderForm"
@@ -157,7 +157,64 @@
                     </el-form>
 
                 </el-tab-pane>
-                <el-tab-pane label="表信息" name="second">配置管理</el-tab-pane>
+                <el-tab-pane label="表信息" name="second">
+                    <el-table
+                            :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                            style="width: 100%">
+                        <el-table-column
+                                prop="tableName"
+                                label="表名"
+                                width="240">
+                        </el-table-column>
+                        <el-table-column
+                                prop="status"
+                                label="状态"
+                                width="180">
+                        </el-table-column>
+                        <el-table-column
+                                prop="update"
+                                label="是否抽取">
+                            <template>
+                                <el-select v-model="updateOptionsValue" placeholder="请选择抽取方式">
+                                    <el-option
+                                            v-for="item in updateOptions"
+                                            :key="item.value"
+                                            :label="item.label"
+                                            :value="item.value">
+                                    </el-option>
+                                </el-select>
+                            </template>
+                        </el-table-column>
+                        <el-table-column
+                                prop="operation"
+                                label="操作">
+                            <template slot-scope="scope">
+                                <el-popover
+                                        ref="popover"
+                                        placement="right"
+                                        trigger="click">
+                                    <el-radio-group v-model="defaultUpdateType" type="vertical"
+                                                    @change="showUpdateType">
+                                        <el-radio :label="0">全量覆盖抽取</el-radio>
+                                        <el-radio :label="1">全量追加抽取</el-radio>
+                                        <el-radio :label="2">添加定时任务</el-radio>
+                                    </el-radio-group>
+                                </el-popover>
+                                <el-button v-popover:popover type="text" size="small">抽取方式</el-button>
+                                <el-button type="text" size="small" @click="del(scope.row)">删除</el-button>
+                                <el-button type="text" size="small" v-if="updateOptionsValue ==  0"
+                                           @click="update(scope.row)">立即执行
+                                </el-button>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                    <el-pagination @size-change="handleSizeChange"
+                                   @current-change="handleCurrentChange"
+                                   :current-page="currentPage"
+                                   :page-size="pageSize" layout="total, sizes, prev, pager, next, jumper"
+                                   :total="tableData.length">
+                    </el-pagination>
+                </el-tab-pane>
                 <el-tab-pane label="操作记录" name="third">
                     <el-table stripe :data="operationLogTable" row-key="id">
                         <el-table-column prop="createTime" label="时间" sortable/>
@@ -625,7 +682,6 @@
 
 
         handleNodeClick(data: any, node: any, ev: any) {
-            this.currentData = data;
             this.hideForm();
             switch (data.type) {
                 case -1:
@@ -636,6 +692,8 @@
                     if (data.url.startsWith("jdbc:mysql")) {
                         this.visibleMap.mysqlFormVisible = true;
                         this.mysqlForm = data;
+                        this.getDataSourceTable(this.mysqlForm.id);
+                        this.tabClick(this.mysqlForm.id)
                     } else {
                         this.visibleMap.oracleFormVisible = true;
                         this.oracleForm = data;
@@ -695,16 +753,118 @@
             return true;
         }
 
-        tabClick(val: any) {
-            if (val.name == "third") {
-                this.axios.post("findAll7DaysLog/" + this.currentData.id).then(result => {
-                    let v = new Result(result);
-                    if (v.code == 200) {
-                        this.operationLogTable = v.data;
-                    }
+        tabClick(id: any) {
+            this.axios.post("findAll7DaysLog/"+id).then(result => {
+                let v = new Result(result);
+                if (v.code == 200) {
+                    this.operationLogTable = v.data;
+                }
 
-                });
+            });
+        }
+
+        private tableData = [];
+
+        private currentPage = 1;
+
+        private pageSize = 10;
+
+        handleSizeChange(val: any) {
+            this.pageSize = val;
+        }
+
+        handleCurrentChange(val: any) {
+            this.currentPage = val;
+        }
+
+        /**
+         * 是否更新
+         */
+        private updateOptions = [{
+            value: '0',
+            label: '是'
+        }, {
+            value: '1',
+            label: '否'
+        }];
+
+        //
+        private updateOptionsValue = "0";
+
+        //默认抽取方式
+        private defaultUpdateType = 0;
+
+        /**
+         * 抽取方式选择弹窗
+         */
+        showUpdateType(value: any) {
+            let t: any = this;
+            if (value == 2) {
+                t.$message.success("你选择了 添加定时任务  打开");
+            } else {
+                console.log(value);
             }
+        }
+
+
+        /**
+         * 根据sourceId查询table
+         */
+        getDataSourceTable(id: any) {
+            this.axios.post("getTable/" + id, {}).then((result) => {
+                if (result.data.code == 200) {
+                    this.tableData = result.data.data;
+                }
+            });
+        }
+
+        /**
+         * 删除
+         * @param row
+         */
+        del(row: any) {
+            let t: any = this;
+            t.$confirm('此操作将删除本地数据库中表, 是否继续?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                this.axios.post("delete", {'name': row.tableName, 'dataSourceId': 12}).then((result) => {
+                    if (result.data.code == 200) {
+                        t.$message.success("删除成功");
+                        this.getDataSourceTable();
+                    } else {
+                        t.$message.error(result.data.msg);
+                    }
+                });
+            }).catch(() => {
+                t.$message({
+                    type: 'info',
+                    message: '已取消删除'
+                });
+            });
+
+
+        }
+
+        /**
+         * 立即执行
+         * @param row
+         */
+        update(row: any) {
+            let t: any = this;
+            this.axios.post("update", {
+                'resourceId': 12,
+                'tableName': row.tableName,
+                'updateType': this.updateType
+            }).then((result) => {
+                if (result.data.code == 200) {
+                    t.$message.success("数据抽取成功");
+                    this.getDataSourceTable();
+                } else {
+                    t.$message.error(result.data.msg);
+                }
+            });
         }
 
     }
