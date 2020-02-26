@@ -45,3 +45,15 @@ export class DataSourceLog {
     public user!: SysUser;
 }
 
+export class DataTable {
+
+    public id!: bigint;
+
+    public tableName!: string;
+
+    public update!: string;
+
+    public updateType!: number;
+}
+
+

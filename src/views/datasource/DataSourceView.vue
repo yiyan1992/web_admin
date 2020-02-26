@@ -256,8 +256,8 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import {DataSource, DataSourceLog} from "src/entity/DataSource";
-    import {Result} from "src/entity/Base";
+    import {DataSource, DataSourceLog, DataTable} from "@/entity/DataSource";
+    import {Result} from "@/entity/Base";
     import {Message, MessageBox} from "element-ui";
 
     @Component
@@ -429,7 +429,7 @@
             const ref: any = this.$refs[form];
             ref.validate((valid: boolean) => {
                 if (valid) {
-                    this.axios.post("/checkConnection", f).then(result => {
+                    this.axios.post("dataSource/checkConnection", f).then(result => {
                         if (result.data.code == 200) {
                             this.visibleMap.oracleFormVisible = false;
                             this.visibleMap.mysqlFormVisible = false;
@@ -466,7 +466,7 @@
             const ref: any = this.$refs[form];
             ref.validate((valid: boolean) => {
                 if (valid) {
-                    this.axios.post("/saveDataSource", f).then(result => {
+                    this.axios.post("dataSource/save", f).then(result => {
                         if (result.data.code == 200) {
                             this.visibleMap.oracleFormVisible = false;
                             this.visibleMap.excelFormVisible = false;
@@ -487,7 +487,7 @@
             const ref: any = this.$refs[form];
             ref.validate((valid: boolean) => {
                 if (valid) {
-                    this.axios.post("/checkConnection", this.dataSourceForm).then(result => {
+                    this.axios.post("dataSource/checkConnection", this.dataSourceForm).then(result => {
                         if (result.data.code == 200) {
                             this.visibleMap.ftpFormVisible = false;
                             this.loadTree();
@@ -642,7 +642,7 @@
                 draggingNode.data.parentId = dropNode.data.parentId;
             }
 
-            this.axios.post("/saveDataSource", draggingNode.data).then(result => {
+            this.axios.post("dataSource/save", draggingNode.data).then(result => {
                 if (result.data.code == 200) {
                     this.loadTree();
                 }
@@ -659,7 +659,7 @@
         }
 
         tabClick(id: any) {
-            this.axios.post("findAll7DaysLog/" + id).then(result => {
+            this.axios.post("dataSource/findAll7DaysLog/" + id).then(result => {
                 let v = new Result(result);
                 if (v.code == 200) {
                     this.operationLogTable = v.data;
@@ -708,9 +708,9 @@
         showUpdateType(value: any) {
             let t: any = this;
             if (value == 2) {
-                t.$message.success("你选择了 添加定时任务  打开");
+                Message.success("你选择了 添加定时任务");
             } else {
-                console.log(value);
+                Message.success("你选择了 其他任务");
             }
         }
 
@@ -719,7 +719,7 @@
          * 根据sourceId查询table
          */
         getDataSourceTable(id: any) {
-            this.axios.post("getTable/" + id, {}).then((result) => {
+            this.axios.post("tableInfo/getTable", this.dataSourceForm).then((result) => {
                 if (result.data.code == 200) {
                     this.tableData = result.data.data;
                 }
@@ -737,23 +737,18 @@
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                this.axios.post("delete", {'name': row.tableName, 'dataSourceId': 12}).then((result) => {
+                this.axios.post("tableInfo/delete", {'name': row.tableName, 'dataSourceId': this.dataSourceForm.id}).then((result) => {
                     if (result.data.code == 200) {
-                        t.$message.success("删除成功");
-                        this.getDataSourceTable(this.currentData.id);
+                        Message.success("删除成功");
+                        this.getDataSourceTable(this.dataSourceForm.id);
                     } else {
-                        t.$message.error(result.data.msg);
+                        Message.error(result.data.msg);
                     }
                 });
-            }).catch(() => {
-                t.$message({
-                    type: 'info',
-                    message: '已取消删除'
-                });
-            });
-
-
+            })
         }
+
+        private dataTable = new DataTable();
 
         /**
          * 立即执行
@@ -761,16 +756,15 @@
          */
         update(row: any) {
             let t: any = this;
-            this.axios.post("update", {
-                'resourceId': 12,
-                'tableName': row.tableName,
-                'updateType': this.updateType
-            }).then((result) => {
+            this.dataTable.id = this.dataSourceForm.id;
+            this.dataTable.tableName = row.tableName;
+            this.dataTable.updateType = this.updateType;
+            this.axios.post("tableInfo/update", this.dataTable).then((result) => {
                 if (result.data.code == 200) {
-                    t.$message.success("数据抽取成功");
+                    Message.success("数据抽取成功");
                     this.getDataSourceTable(row.id);
                 } else {
-                    t.$message.error(result.data.msg);
+                    Message.error(result.data.msg);
                 }
             });
         }
