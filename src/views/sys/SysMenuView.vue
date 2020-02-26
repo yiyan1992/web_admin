@@ -55,8 +55,8 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
 
-    import {SysMenu} from '../../entity/Sys';
-    import {Result, JpaPage} from '../../entity/Base';
+    import {SysMenu} from '@/entity/Sys';
+    import {Result} from '@/entity/Base';
     import {Message, MessageBox} from "element-ui";
 
     @Component

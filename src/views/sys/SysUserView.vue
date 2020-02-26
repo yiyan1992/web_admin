@@ -95,7 +95,7 @@
 
     import {SysUser} from '@/entity/Sys';
     import {Result, JpaPage} from '@/entity/Base';
-    import {Message, MessageBox, Select} from "element-ui";
+    import {Message, MessageBox} from "element-ui";
     import SelectRole from "@/components/SelectRole.vue";
 
     @Component({
