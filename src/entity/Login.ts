@@ -14,7 +14,7 @@ export class CheckTokenResponse {
 
     public user!: SysUser;
 
-    public menus!: Set<SysMenu>;
+    public menus!: Array<SysMenu>;
 
     public company!: Company;
 

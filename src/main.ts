@@ -7,11 +7,13 @@ import VueAxios from "vue-axios";
 
 Vue.config.productionTip = false;
 
-Vue.prototype.hasPermission = function (str: string) {
-    if (str=="aaa"){
-        return false;
-    }
-    return true;
+Vue.prototype.hasPermission = function (str: string): boolean {
+    if (str == null || str.length == 0) return false;
+    let item = sessionStorage.getItem("permission");
+    if (item == null || item.length == 0) return false;
+    let strings = item.split(",");
+    let set = new Set(strings);
+    return set.has(str);
 }
 
 new Vue({

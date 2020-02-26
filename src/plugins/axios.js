@@ -40,7 +40,7 @@ _axios.interceptors.response.use(
     function (response) {
         let v = new Result(response);
         if (v.code === 400) {
-            sessionStorage.removeItem("Authorization");
+            sessionStorage.clear();
             router.replace("/login").then(r => {
                 Message.warning("登录已过期,请重新登录!");
             });

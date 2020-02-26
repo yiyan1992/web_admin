@@ -3,8 +3,8 @@
 
         <div id="left">
             <el-button @click="toAddParent">添加顶级菜单</el-button>
-            <el-button @click="toAddNode">添加选择节点子菜单</el-button>
-            <el-button @click="toRemoveNode">删除选择节点</el-button>
+            <el-button @click="toAddNode">添加子菜单</el-button>
+            <el-button @click="toRemoveNode">删除菜单</el-button>
             <el-divider/>
 
             <el-tree
@@ -72,8 +72,7 @@
             name: [
                 {required: true, message: "请输入名称", trigger: "blur"},
                 {min: 3, max: 20, message: "长度在 3 到 20 个字符", trigger: "blur"}
-            ],
-            permission: [{required: true, message: "请输入权限", trigger: "blur"},]
+            ]
         }
 
         created() {

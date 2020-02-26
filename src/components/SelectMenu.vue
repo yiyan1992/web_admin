@@ -5,7 +5,6 @@
                 default-expand-all
                 show-checkbox
                 :default-checked-keys="defaultCheckedKeys"
-                check-strictly
                 node-key="id" ref="tree">
                   <span class="custom-tree-node" slot-scope="{ node, data }">
                       <span>

@@ -2,22 +2,22 @@
     <div id="banner">
         <el-row>
             <el-col :span="4">
-                管理后台
+                <span style="font-size: 30px">管理后台</span>
             </el-col>
             <el-col :span="1" :offset="17">
                 <el-badge :value="messageNumber" class="item" id="msg">
-                    <el-button icon="el-icon-message-solid" circle></el-button>
+                    <el-button icon="el-icon-message-solid" circle @click="toMessage"></el-button>
                 </el-badge>
             </el-col>
             <el-col :span="1">
-                <el-dropdown>
-                    <span>
-                        <i class="el-icon-user-solid"></i>张三
+                <el-dropdown @command="dropDownHandle">
+                    <span style="font-size: 20px">
+                        <i class="el-icon-user-solid"></i>{{data.user==undefined?"":data.user.name}}
                     </span>
                     <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item @click="toMy">我的</el-dropdown-item>
-                        <el-dropdown-item @click="toPwd">密码</el-dropdown-item>
-                        <el-dropdown-item @click="logout">注销</el-dropdown-item>
+                        <el-dropdown-item command="my">我的</el-dropdown-item>
+                        <el-dropdown-item command="pwd">密码</el-dropdown-item>
+                        <el-dropdown-item command="logout">注销</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
             </el-col>
@@ -25,17 +25,14 @@
         <el-divider/>
         <div id="left">
             <el-menu class="el-menu-vertical-demo" router>
-                <el-submenu index="0">
+
+                <el-submenu v-for="menu in menus" v-bind:key="menu.id" :index="menu.name">
                     <template slot="title">
-                        <i class="el-icon-location"/>
-                        <span slot="title">导航一</span>
+                        <span slot="title">{{menu.name}}</span>
                     </template>
-                    <el-menu-item index="/401">选项1</el-menu-item>
-                    <el-menu-item index="/about">选项2</el-menu-item>
-                    <el-menu-item index="/dataSource">数据源</el-menu-item>
-                    <el-menu-item index="/sysRole">角色</el-menu-item>
-                    <el-menu-item index="/sysMenu">菜单</el-menu-item>
-                    <el-menu-item index="/sysUser">用户</el-menu-item>
+                    <el-menu-item :index="child.url" v-for="child in menu.children" v-bind:key="child.id">
+                        {{child.name}}
+                    </el-menu-item>
                 </el-submenu>
             </el-menu>
         </div>
@@ -49,14 +46,16 @@
     import {Component, Vue} from 'vue-property-decorator';
     import {Result} from "@/entity/Base";
     import {CheckTokenResponse} from "@/entity/Login";
-    import {SysUser} from "@/entity/Sys";
+    import {SysMenu} from "@/entity/Sys";
 
     @Component
     export default class App extends Vue {
 
         private messageNumber: number = 0;
 
-        private user: SysUser = new SysUser();
+        private data: CheckTokenResponse = new CheckTokenResponse();
+
+        private menus: SysMenu[] = [];
 
         mounted() {
             this.messageNumber = 2;
@@ -67,14 +66,60 @@
 
                     let v = new Result(result);
                     if (v.code == 200) {
-                        let data: CheckTokenResponse = v.data;
-                        this.user = data.user;
+                        this.data = v.data;
+                        this.resolverMenu();
+                        this.permission();
                     } else {
                         this.$router.replace("/login")
                     }
                 });
             } else {
                 this.$router.replace("/login")
+            }
+        }
+
+        resolverMenu() {
+            let parents = this.data.menus.filter(e => {
+                return e.parentId == null;
+            })
+            parents = parents.sort((a, b) => {
+                if (a.id == b.id) {
+                    return 0;
+                }
+                return a.id > b.id ? 1 : -1;
+            });
+
+            parents.forEach(parent => {
+                let children = this.data.menus.filter(e => {
+                    return parent.id == e.parentId;
+                });
+                children = children.sort((a, b) => {
+                    if (a.id == b.id) {
+                        return 0;
+                    }
+                    return a.id > b.id ? 1 : -1;
+                });
+                parent.children = children;
+            })
+            this.menus = parents;
+        }
+
+        permission() {
+            let arr = this.data.menus.filter(e => {
+                return e.permission != null && e.permission.length > 0;
+            }).map(e => {
+                return e.permission;
+            }).join(",");
+            sessionStorage.setItem("permission", arr);
+        }
+
+        dropDownHandle(val: string) {
+            if (val == "logout") {
+                this.logout();
+            } else if (val == "my") {
+                this.toMy();
+            } else if (val == "pwd") {
+                this.toPwd();
             }
         }
 
@@ -88,8 +133,12 @@
 
         logout() {
             this.axios.get("logout");
-            sessionStorage.removeItem("Authorization");
-            this.$router.replace("/login")
+            sessionStorage.clear();
+            this.$router.push("/login");
+        }
+
+        toMessage() {
+
         }
 
     }
