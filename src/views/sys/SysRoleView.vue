@@ -74,7 +74,7 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
 
-    import {SysRole, SysMenu} from '@/entity/Sys';
+    import {SysRole} from '@/entity/Sys';
     import {Result, JpaPage} from '@/entity/Base';
     import {Message, MessageBox} from "element-ui";
     import SelectMenu from "@/components/SelectMenu.vue";
