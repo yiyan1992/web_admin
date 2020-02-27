@@ -27,7 +27,7 @@
             </el-tree>
         </div>
         <div id="right">
-            <el-tabs type="card" value="first" stretch>
+            <el-tabs type="card" v-model="defaultTab" stretch>
                 <el-tab-pane label="基本信息" name="first">
                     <!--文件夹 form-->
                     <el-form :model="dataSourceForm" :rules="rules" label-width="100px" ref="folderForm"
@@ -263,6 +263,8 @@
     @Component
     export default class DataSourceView extends Vue {
 
+        private defaultTab = 'first';
+
         //树数据
         private treeData = [];
 
@@ -331,6 +333,7 @@
          * 新增节点
          */
         addDataSource(node: any, data: any) {
+            this.defaultTab = 'first';
             this.currentData = data;
             this.dataSourceForm = new DataSource();
             this.dataSourceForm.parentId = data.id;
@@ -354,6 +357,7 @@
         }
 
         showDialog(type: number) {
+            this.defaultTab = 'first';
             this.currentData = {};
             this.dataSourceForm = new DataSource();
             this.visibleMap.createDialogVisible = true;
@@ -410,19 +414,10 @@
             if (form == "mysqlForm") {
                 f.url = "jdbc:mysql://" + this.dataSourceForm.serverAddress + ":" + this.dataSourceForm.port + "/" +
                     this.dataSourceForm.databaseName + "?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true";
-
-                if (this.dataSourceForm.id > 0 && this.currentData != null) {
-                    this.dataSourceForm.parentId = this.currentData.id;
-                }
-
             } else {
                 f.url = "jdbc:oracle:thin:@" + this.dataSourceForm.serverAddress + ":" + this.dataSourceForm.port + ":" +
                     this.dataSourceForm.databaseName;
                 f = this.dataSourceForm;
-
-                if (this.dataSourceForm.id > 0 && this.currentData != null) {
-                    this.dataSourceForm.parentId = this.currentData.id;
-                }
             }
             const ref: any = this.$refs[form];
             ref.validate((valid: boolean) => {
@@ -586,6 +581,7 @@
 
         handleNodeClick(data: any, node: any, ev: any) {
             this.hideForm();
+            debugger
             switch (data.type) {
                 case -1:
                     this.visibleMap.folderFormVisible = true;
@@ -602,10 +598,9 @@
                     this.getDataSourceTable(data.id);
                     this.tabClick(data.id)
                     break;
-                case 1:
+                case 2:
                     this.visibleMap.excelFormVisible = true;
                     this.dataSourceForm = data;
-
                     var str1 = this.dataSourceForm.url.split(",");
                     var str2 = this.dataSourceForm.databaseName.split(",");
                     var str3 = this.dataSourceForm.username.split(",");
@@ -622,7 +617,7 @@
                         });
                     }
                     break;
-                case 2:
+                case 3:
                     this.visibleMap.ftpFormVisible = true;
                     this.dataSourceForm = data;
                     break;
