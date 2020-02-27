@@ -333,6 +333,7 @@
         addDataSource(node: any, data: any) {
             this.currentData = data;
             this.dataSourceForm = new DataSource();
+            this.dataSourceForm.parentId = data.id;
             this.visibleMap.createDialogVisible = true;
         }
 
@@ -391,9 +392,6 @@
 
         //创建文件夹保存
         createFolder(form: string) {
-            if (this.currentData.id > 0) {
-                this.dataSourceForm.parentId = this.currentData.id
-            }
             const ref: any = this.$refs[form];
             ref.validate((valid: boolean) => {
                 if (valid) {
