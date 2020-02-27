@@ -16,7 +16,7 @@
                     </span>
                     <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item command="my">我的</el-dropdown-item>
-                        <el-dropdown-item command="pwd">密码</el-dropdown-item>
+                        <el-dropdown-item command="pwd">修改密码</el-dropdown-item>
                         <el-dropdown-item command="logout">注销</el-dropdown-item>
                     </el-dropdown-menu>
                 </el-dropdown>
@@ -125,7 +125,7 @@
         }
 
         toPwd() {
-
+            this.$router.push("/resetPwd");
         }
 
         logout() {
