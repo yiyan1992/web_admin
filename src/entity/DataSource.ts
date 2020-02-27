@@ -54,6 +54,25 @@ export class DataTable {
     public update!: string;
 
     public updateType!: number;
+
+    public status: string = "全量";
+}
+
+export class DataTableColumnMapping {
+
+    public id!: bigint;
+
+    public dataSource!: DataSource;
+
+    public tableName!: string;
+
+    public columnName!:string;
+
+    public columnTypeName!:string;
+
+    public targetTableName!:string;
+
+    public targetColumnName!:string;
 }
 
 
