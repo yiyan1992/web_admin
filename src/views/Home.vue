@@ -59,23 +59,20 @@
 
         mounted() {
             this.messageNumber = 2;
-
             let item = sessionStorage.getItem("Authorization");
             if (item != null && item.length > 0) {
                 this.axios.get("checkToken").then(result => {
-
                     let v = new Result(result);
                     if (v.code == 200) {
                         this.data = v.data;
                         this.resolverMenu();
                         this.permission();
-                    } else {
-                        this.$router.replace("/login")
+                        return;
                     }
+                    this.$router.replace("/login")
                 });
-            } else {
+            } else
                 this.$router.replace("/login")
-            }
         }
 
         resolverMenu() {

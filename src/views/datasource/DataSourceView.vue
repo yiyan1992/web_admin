@@ -491,7 +491,7 @@
         }
 
         uploadAction() {
-            return "http://127.0.0.1:80/data/source/uploadFile";
+            return process.env.VUE_APP_UPLOAD_URL;
         }
 
         uploadHeader() {
@@ -516,12 +516,12 @@
             const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
             const isOver = file.size / 1024 / 1024 < 10;
             if (!isExcel) {
-                (this as any).$message.error('上传只能是EXCEL文件!');
+                Message.error('上传只能是EXCEL文件!');
                 return false;
             }
 
             if (!isOver) {
-                (this as any).$message.error('上传只能是小于10M!');
+                Message.error('上传只能是小于10M!');
                 return false;
             }
             return true;
@@ -566,7 +566,7 @@
             this.transformFileList(fileList);
             const fileName: string = file.name;
             let number = fileName.lastIndexOf(".");
-            this.axios.post("delUploadFile/" + file.size + fileName.substring(0, number)
+            this.axios.post("file/delUploadFile/" + file.size + fileName.substring(0, number)
                 + "/" + fileName.substring(number + 1));
         }
 
@@ -581,7 +581,6 @@
 
         handleNodeClick(data: any, node: any, ev: any) {
             this.hideForm();
-            debugger
             switch (data.type) {
                 case -1:
                     this.visibleMap.folderFormVisible = true;

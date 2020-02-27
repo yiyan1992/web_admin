@@ -194,7 +194,6 @@
             this.axios.post("company/findForPage", this.form).then(result => {
                 let v = new Result(result);
                 this.page = v.translateJpa();
-                console.log(this.page)
                 this.table = v.data.content;
             });
         }

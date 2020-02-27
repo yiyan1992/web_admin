@@ -4,7 +4,7 @@ import Vue from 'vue';
 import axios from "axios";
 import router from "../router";
 import {Result} from "../entity/Base";
-import {Message, MessageBox, Select} from "element-ui";
+import {Message} from "element-ui";
 
 // Full config:  https://github.com/axios/axios#request-config
 // axios.defaults.baseURL = process.env.baseURL || process.env.apiUrl || '';
@@ -12,9 +12,9 @@ import {Message, MessageBox, Select} from "element-ui";
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 const PREFIX = "Bearer ";
-
+console.log(process.env.VUE_APP_BASE_URL)
 let config = {
-    baseURL: "http://127.0.0.1:80/data/source/",
+    baseURL: process.env.VUE_APP_BASE_URL,
     timeout: 60 * 1000, // Timeout
     withCredentials: true, // Check cross-site Access-Control
 };

@@ -75,7 +75,6 @@
         loadTree() {
             this.axios.get("department/findForTree", {}).then((result) => {
                 let v = new Result(result);
-                console.log(v)
                 if (v.code == 200) {
                     this.treeData = v.data;
                 } else {
