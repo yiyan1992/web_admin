@@ -26,7 +26,7 @@ export class Department extends DataPage {
 
     public company!: Company;
 
-    public parent!: Department;
+    public parentId!: bigint;
 
     public users!: Set<SysUser>;
 

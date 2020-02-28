@@ -154,6 +154,7 @@
                     if (v.code == 200) {
                         this.loadTree();
                         Message.success("删除成功!");
+                        this.formShow = false;
                     }
                 });
             }).catch(() => {

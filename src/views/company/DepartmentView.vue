@@ -28,6 +28,9 @@
         </div>
         <div id="right">
             <el-form :model="form" :rules="rules" label-width="100px" ref="form" v-if="formShow">
+                <el-form-item label="所属公司" prop="companyName">
+                    <el-input v-model="companyName" :disabled="true"/>
+                </el-form-item>
                 <el-form-item label="部门名称" prop="name">
                     <el-input v-model="form.name"/>
                 </el-form-item>
@@ -58,14 +61,17 @@
 
         private formShow: boolean = false;
 
-        private form: SysMenu = new SysMenu();
+        private form: Department = new Department();
+
+        private companyName = '';
+
+        private showFatherDep = false;
 
         private rules = {
             name: [
-                {required: true, message: "请输入名称", trigger: "blur"},
+                {required: true, message: "请输入部门名称", trigger: "blur"},
                 {min: 3, max: 20, message: "长度在 3 到 20 个字符", trigger: "blur"}
             ],
-            permission: [{required: true, message: "请输入权限", trigger: "blur"},]
         }
 
         created() {
@@ -101,25 +107,24 @@
 
         toAddParent() {
             this.formShow = true;
-            this.form = new SysMenu();
+            this.form = new Department();
         }
 
         toAddNode() {
             let tree = (this as any).$refs.tree;
-
             let currentNode = tree.getCurrentNode();
+            this.companyName = currentNode.company.name
             if (currentNode == null) {
                 Message.warning("先选择一个节点!");
                 return;
             } else {
-
                 if (currentNode.button) {
                     Message.warning("按钮节点不能添加子节点!");
                     return;
                 }
 
                 this.formShow = true;
-                this.form = new SysMenu();
+                this.form = new Department();
                 this.form.parentId = currentNode.id;
             }
         }
@@ -137,16 +142,17 @@
                 return;
             }
 
-            MessageBox.confirm('此操作将删除该菜单, 是否继续?', '提示', {
+            MessageBox.confirm('此操作将删除该部门, 是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                this.axios.post("sys/menu/deleteById/" + currentNode.id).then(result => {
+                this.axios.post("department/deleteById/" + currentNode.id).then(result => {
                     let v = new Result(result);
                     if (v.code == 200) {
                         this.loadTree();
                         Message.success("删除成功!");
+                        this.formShow = false;
                     }
                 });
             }).catch(() => {
@@ -154,9 +160,10 @@
             });
         }
 
-        handleNodeClick(data: SysMenu, node: any, ev: any) {
+        handleNodeClick(data: Department, node: any, ev: any) {
             this.formShow = true;
             this.form = data;
+            this.companyName = data.company.name;
         }
 
         handleDrop(draggingNode: any, dropNode: any, dropType: any, ev: any) {
@@ -167,7 +174,7 @@
                 draggingNode.data.parentId = dropNode.data.parentId;
             }
 
-            this.axios.post("/sys/menu/save", draggingNode.data).then(result => {
+            this.axios.post("/department/save", draggingNode.data).then(result => {
                 if (result.data.code == 200) {
                     this.loadTree();
                 }
