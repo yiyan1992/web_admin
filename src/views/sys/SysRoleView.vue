@@ -38,10 +38,10 @@
             </div>
             <el-form :model="dialog.form" label-width="110px" :rules="dialog.rules" ref="dialog.form"
                      style="width: 50%;margin-left: 25%;margin-right: 25%;">
-                <el-form-item label="角色名称" prop="roleName">
+                <el-form-item label="角色名称" prop="name">
                     <el-input v-model="dialog.form.name" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="角色描述" prop="roleDesc">
+                <el-form-item label="角色描述" prop="description">
                     <el-input v-model="dialog.form.description" autocomplete="off"></el-input>
                 </el-form-item>
             </el-form>

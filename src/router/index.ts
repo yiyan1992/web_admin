@@ -9,6 +9,8 @@ import SysMenuView from "@/views/sys/SysMenuView.vue";
 import DepartmentView from "@/views/company/DepartmentView.vue";
 import SysUserView from "@/views/sys/SysUserView.vue";
 import ResetPwd from "@/views/ResetPwd.vue";
+import SysAlgorithmView from "@/views/algorithm/SysAlgorithmView.vue";
+import CompanyAlgorithmView from "@/views/algorithm/CompanyAlgorithmView.vue";
 
 Vue.use(VueRouter);
 
@@ -47,27 +49,35 @@ const routes = [
                 path: '/sysRole',
                 name: 'sysRole',
                 component: SysRoleView
-            },{
+            }, {
                 path: '/company',
                 name: 'company',
                 component: CompanyView
-            },{
+            }, {
                 path: '/sysMenu',
                 name: 'sysMenu',
                 component: SysMenuView
-            },{
+            }, {
                 path: '/department',
                 name: 'department',
                 component: DepartmentView
-            },{
+            }, {
                 path: '/sysUser',
                 name: 'sysUser',
                 component: SysUserView
-            },{
+            }, {
                 path: '/resetPwd',
                 name: 'resetPwd',
                 component: ResetPwd
-            },
+            }, {
+                path: '/sysAlgorithm',
+                name: 'sysAlgorithm',
+                component: SysAlgorithmView
+            }, {
+                path: '/companyAlgorithm',
+                name: 'companyAlgorithm',
+                component: CompanyAlgorithmView
+            }
         ]
     }
 

@@ -28,6 +28,7 @@
 
                 <el-submenu v-for="menu in menus" v-bind:key="menu.id" :index="menu.name">
                     <template slot="title">
+                        <i class="el-icon-menu"></i>
                         <span slot="title">{{menu.name}}</span>
                     </template>
                     <el-menu-item :index="child.url" v-for="child in menu.children" v-bind:key="child.id">
@@ -53,20 +54,22 @@
 
         private messageNumber: number = 0;
 
-        private data: CheckTokenResponse = new CheckTokenResponse();
+        public data: CheckTokenResponse = new CheckTokenResponse();
 
         private menus: SysMenu[] = [];
 
         mounted() {
-            this.messageNumber = 2;
+            let t=this;
+            t.messageNumber = 2;
             let item = sessionStorage.getItem("Authorization");
             if (item != null && item.length > 0) {
                 this.axios.get("checkToken").then(result => {
                     let v = new Result(result);
                     if (v.code == 200) {
-                        this.data = v.data;
-                        this.resolverMenu();
-                        this.permission();
+                        t.data = v.data;
+                        t.resolverMenu();
+                        t.permission();
+                        t.globalData = v.data;
                         return;
                     }
                     this.$router.replace("/login")

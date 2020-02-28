@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import './plugins/axios'
+import './plugins/globalData'
 import App from './App.vue'
 import router from './router'
 import './plugins/element.js'
@@ -15,6 +16,7 @@ Vue.prototype.hasPermission = function (str: string): boolean {
     let set = new Set(strings);
     return set.has(str);
 }
+
 
 new Vue({
     router,
