@@ -7,11 +7,6 @@
                     <el-input v-model="form.name" clearable/>
                 </el-form-item>
             </el-col>
-            <el-col :span="6">
-                <el-form-item label="角色名称">
-                    <el-input v-model="form.description" clearable/>
-                </el-form-item>
-            </el-col>
         </el-form>
         <el-button class="el-button--primary" @click="searchForm('form')">查询</el-button>
         <el-button @click="toAdd">添加</el-button>

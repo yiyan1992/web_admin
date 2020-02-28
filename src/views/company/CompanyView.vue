@@ -8,25 +8,19 @@
                             <el-input v-model="form.name" clearable/>
                         </el-form-item>
                     </el-col>
-                    <el-col :span="6">
-                        <el-form-item label="公司管理员">
-                            <el-input v-model="form.user.id" clearable/>
-                        </el-form-item>
-                    </el-col>
                 </el-form>
                 <el-button class="el-button--primary" @click="searchForm('form')">查询</el-button>
                 <el-button @click="toAdd">添加</el-button>
                 <el-divider/>
                 <el-table stripe :data="table" row-key="id" border>
-                    <el-table-column prop="name" label="名称" sortable/>
-                    <el-table-column prop="description" label="描述" sortable/>
+                    <el-table-column prop="name" label="名称"/>
+                    <el-table-column prop="user.name" label="管理员"/>
+                    <el-table-column prop="description" label="描述"/>
                     <el-table-column label="操作">
                         <template slot-scope="scope">
                             <el-button @click="toUpdate(scope.$index, scope.row)" type="text">编辑</el-button>
                             <el-button @click.prevent="toDelete(scope.$index, scope.row)" type="text">删除</el-button>
                             <el-button @click.prevent="showEmployee(scope.$index, scope.row)" type="text">查看员工
-                            </el-button>
-                            <el-button @click.prevent="addEmployee(scope.$index, scope.row)" type="text">添加员工
                             </el-button>
                         </template>
                     </el-table-column>
@@ -41,53 +35,57 @@
                 </el-pagination>
             </div>
             <div class="right" v-if="employeeTableShow">
-                <el-table stripe
-                          :data="employeeTable.slice((employeeCurrentPage-1)*employeePageSize,employeeCurrentPage*employeePageSize)"
-                          row-key="id"
-                          border>
-                    <el-table-column prop="name" label="员工姓名" width="120px" align="center"/>
-                    <el-table-column prop="phone" label="联系电话" width="120px" align="center"/>
-                    <el-table-column prop="email" label="邮箱" width="180px" align="center"/>
-                </el-table>
-                <el-pagination align='center' @size-change="handleEmployeeSizeChange"
-                               @current-change="handleEmployeeCurrentChange"
-                               :current-page="employeeCurrentPage" :page-sizes="[5,10,20]" :page-size="employeePageSize"
-                               layout="total, sizes, prev, pager, next" :total="employeeTable.length">
-                </el-pagination>
-
             </div>
         </div>
 
-
-        <el-dialog :visible.sync="dialog.show">
+        <el-dialog :visible.sync="employeeTableShow">
             <div slot="title" class="header-title">
-                <span> {{ dialog.title }}</span>
+                <span>查看员工</span>
             </div>
-            <el-form :model="dialog.form" label-width="110px" :rules="dialog.rules" ref="dialog.form"
+            <el-table stripe
+                      :data="employeeTable.slice((employeeCurrentPage-1)*employeePageSize,employeeCurrentPage*employeePageSize)"
+                      row-key="id"
+                      border>
+                <el-table-column prop="name" label="员工姓名" align="center"/>
+                <el-table-column prop="phone" label="联系电话" align="center"/>
+                <el-table-column prop="email" label="邮箱" align="center"/>
+            </el-table>
+            <el-pagination align='center' @size-change="handleEmployeeSizeChange"
+                           @current-change="handleEmployeeCurrentChange"
+                           :current-page="employeeCurrentPage" :page-sizes="[5,10,20]" :page-size="employeePageSize"
+                           layout="total, sizes, prev, pager, next" :total="employeeTable.length">
+            </el-pagination>
+        </el-dialog>
+
+        <el-dialog :visible.sync="dialogShow">
+            <div slot="title" class="header-title">
+                <span> {{ dialogTitle }}</span>
+            </div>
+            <el-form :model="dialogForm" label-width="110px" :rules="rules" ref="dialogForm"
                      style="width: 50%;margin-left: 25%;margin-right: 25%;">
                 <el-form-item label="公司名称" prop="companyName">
-                    <el-input v-model="dialog.form.name" autocomplete="off"></el-input>
+                    <el-input v-model="dialogForm.name" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="公司描述" prop="companyDesc">
-                    <el-input v-model="dialog.form.description" autocomplete="off"></el-input>
+                    <el-input v-model="dialogForm.description" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="公司管理员" prop="companyManager">
-                    <el-input v-model="dialog.form.user.id" autocomplete="off"></el-input>
+                    <el-input v-model="dialogForm.user.id" autocomplete="off"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="dialog.show = false">取 消</el-button>
-                <el-button type="primary" @click="dialogSave">确 定</el-button>
+                <el-button @click="dialogShow = false">取 消</el-button>
+                <el-button type="primary" @click="dialogSave('dialogForm')">确 定</el-button>
             </div>
         </el-dialog>
 
-        <el-dialog :visible.sync="selectUser.show" width="600px" height="500px">
+        <el-dialog :visible.sync="selectUserData.show">
             <div slot="title" class="header-title">
                 <span> 选择用户</span>
             </div>
-            <select-user v-bind:role-id="selectUser.roleId" ref="selectUser"/>
+            <select-user v-bind:role-id="selectUserData.roleId" ref="selectUser"/>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="selectUser.show = false">取 消</el-button>
+                <el-button @click="selectUserData.show = false">取 消</el-button>
                 <el-button type="primary" @click="userSelect">确 定</el-button>
             </div>
         </el-dialog>
@@ -120,45 +118,42 @@
 
         private page: JpaPage = new JpaPage();
 
-
-        private dialog = {
-            show: false,
-            title: "公司添加",
-            form: new Company(),
-            rules: {
-                name: [
-                    {required: true, message: "请输入公司名称", trigger: "blur"},
-                    {min: 3, max: 20, message: "长度在 3 到 20 个字符", trigger: "blur"}
-                ],
-            }
-        };
+        private dialogTitle = '';
+        private dialogShow = false;
+        private dialogForm = new Company();
+        private rules = {
+            companyName: [
+                {required: true, message: "请输入公司名称", trigger: "blur"},
+            ],
+        }
 
         created() {
             this.searchForm("form");
         }
 
         toAdd() {
-            this.dialog.show = true;
-            this.dialog.title = "公司添加";
-            this.dialog.form = new Company();
+            this.dialogShow = true;
+            this.dialogTitle = "公司添加";
+            this.dialogForm = new Company();
+
         }
 
         toUpdate(index: number, row: any) {
-            this.dialog.title = "公司编辑";
+            this.dialogTitle = "公司编辑";
             this.axios.get("company/findById/" + row.id).then(result => {
                 let v = new Result(result);
-                this.dialog.form = v.data;
+                this.dialogForm = v.data;
             });
-            this.dialog.show = true;
+            this.dialogShow = true;
         }
 
         toDelete(index: number, row: any) {
-            (this as any).$confirm('此操作将删除该公司, 是否继续?', '提示', {
+            (this as any).$confirm('此操作将删除该公司和该公司下所有员工, 是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                this.axios.post("company/deleteById/" + row.id).then(result => {
+                this.axios.post("company/delete", row).then(result => {
                     let v = new Result(result);
                     if (v.code == 200) {
                         (this as any).$message({
@@ -177,15 +172,20 @@
         }
 
         dialogSave(form: string) {
-
-            this.axios.post("company/save", this.dialog.form).then(result => {
-                let v = new Result(result);
-                if (v.code == 200) {
-                    this.dialog.show = false;
-                    this.searchForm("form");
-                    (this as any).$message.success('保存成功!');
-                } else {
-                    (this as any).$message.error('保存失败!');
+            let ref: any;
+            ref = this.$refs[form];
+            ref.validate((valid: boolean) => {
+                if (valid) {
+                    this.axios.post("company/save", this.dialogForm).then(result => {
+                        let v = new Result(result);
+                        if (v.code == 200) {
+                            this.dialogShow = false;
+                            this.searchForm("form");
+                            (this as any).$message.success('保存成功!');
+                        } else {
+                            (this as any).$message.error('保存失败!');
+                        }
+                    });
                 }
             });
         }
@@ -214,7 +214,7 @@
          * @param row
          */
         showEmployee(index: number, row: any) {
-            this.axios.post("company/findEmployee/" + row.id).then(result => {
+            this.axios.post("sys/user/findEmployee/" + row.id).then(result => {
                 let v = new Result(result);
                 if (v.code == 200) {
                     this.employeeTableShow = true;
@@ -237,7 +237,7 @@
         }
 
 
-        private selectUser = {
+        private selectUserData = {
             roleId: null,
             show: false
         }
@@ -248,11 +248,15 @@
          * @param row
          */
         addEmployee(index: number, row: any) {
-            this.selectUser.show = true;
+            this.selectUserData.show = true;
         }
 
-        userSelect(){
-
+        /**
+         * 用户选择弹窗确认事件
+         */
+        userSelect() {
+            let selectUserData: any = this.$refs.selectUserData;
+            selectUserData.getSelectUser();
         }
     }
 

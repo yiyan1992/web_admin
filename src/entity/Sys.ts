@@ -48,4 +48,18 @@ export class SysUser extends DataPage {
 
     public roles!: Array<SysRole>;
 
+    public companyId !: bigint;
+
 }
+
+export class ResetPwd {
+
+
+    public oldPwd!: string;
+
+    public newPwd!: string;
+
+    public newPwdAgain!: string;
+
+}
+

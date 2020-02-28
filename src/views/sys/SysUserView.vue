@@ -1,27 +1,30 @@
 <template>
     <div>
         <el-form :model="form" ref="form" label-width="110px">
-            <el-col :span="6">
-                <el-form-item label="姓名">
-                    <el-input v-model="form.name" clearable/>
-                </el-form-item>
-            </el-col>
-            <el-col :span="6">
-                <el-form-item label="用户名">
-                    <el-input v-model="form.username" clearable/>
-                </el-form-item>
-            </el-col>
-
-            <el-col :span="6">
-                <el-form-item label="邮箱">
-                    <el-input v-model="form.email" clearable/>
-                </el-form-item>
-            </el-col>
-            <el-col :span="6">
-                <el-form-item label="电话">
-                    <el-input v-model="form.phone" clearable/>
-                </el-form-item>
-            </el-col>
+            <el-row>
+                <el-col :span="6">
+                    <el-form-item label="姓名">
+                        <el-input v-model="form.name" clearable/>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                    <el-form-item label="用户名">
+                        <el-input v-model="form.username" clearable/>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row>
+                <el-col :span="6">
+                    <el-form-item label="邮箱">
+                        <el-input v-model="form.email" clearable/>
+                    </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                    <el-form-item label="电话">
+                        <el-input v-model="form.phone" clearable/>
+                    </el-form-item>
+                </el-col>
+            </el-row>
         </el-form>
         <el-button class="el-button--primary" @click="searchForm('form')">查询</el-button>
         <el-button @click="toAdd">添加</el-button>
@@ -68,6 +71,16 @@
                     <el-input v-model="dialog.form.phone" autocomplete="off"></el-input>
                     <el-tag>新增用户密码为手机号后6位</el-tag>
                 </el-form-item>
+                <el-form-item label="所属公司" prop="companyId">
+                    <el-select v-model="dialog.form.companyId" filterable placeholder="请选择所属公司" style="width:100%">
+                        <el-option
+                                v-for="item in companyData"
+                                :key="item.id"
+                                :label="item.name"
+                                :value="item.id">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialog.show = false">取 消</el-button>
@@ -94,9 +107,10 @@
     import {Component, Vue} from 'vue-property-decorator';
 
     import {SysUser} from '@/entity/Sys';
-    import {Result, JpaPage} from '@/entity/Base';
+    import {JpaPage, Result} from '@/entity/Base';
     import {Message, MessageBox} from "element-ui";
     import SelectRole from "@/components/SelectRole.vue";
+    import {Company} from "@/entity/Company";
 
     @Component({
         components: {
@@ -109,6 +123,8 @@
         private form: SysUser = new SysUser();
 
         private table: SysUser[] = [];
+
+        private companyData: Company[] = [];
 
         private page: JpaPage = new JpaPage();
 
@@ -123,6 +139,7 @@
                     {min: 1, max: 20, message: "长度在 1 到 20 个字符", trigger: "blur"}
                 ],
                 username: [
+                    {required: true, message: "请输入用户名", trigger: "blur"},
                     {min: 3, max: 20, message: "长度在 3 到 20 个字符", trigger: "blur"}
                 ],
                 email: [
@@ -132,6 +149,9 @@
                     {required: true, message: "请输入电话", trigger: "blur"},
                     {min: 11, max: 11, message: "请输入电话", trigger: "blur"}
                 ],
+                companyId:[
+                    {required: true, message: "请选择所属公司", trigger: "blur"},
+                ]
             }
         };
 
@@ -148,6 +168,7 @@
             this.dialog.show = true;
             this.dialog.title = "添加";
             this.dialog.form = new SysUser();
+            this.findAllCompany();
         }
 
         toUpdate(index: number, row: any) {
@@ -241,6 +262,14 @@
             this.form.page = val - 1;
             this.searchForm("form");
         }
+
+        findAllCompany() {
+            this.axios.post("company/findForPage", this.form).then(result => {
+                let v = new Result(result);
+                this.companyData = v.data.content;
+            });
+        }
+
     }
 
 
