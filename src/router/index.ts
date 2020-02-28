@@ -8,7 +8,6 @@ import CompanyView from "@/views/company/CompanyView.vue";
 import SysMenuView from "@/views/sys/SysMenuView.vue";
 import DepartmentView from "@/views/company/DepartmentView.vue";
 import SysUserView from "@/views/sys/SysUserView.vue";
-import TargetDataSourceView from "@/views/datasource/TargetDataSourceView.vue";
 import ResetPwd from "@/views/ResetPwd.vue";
 
 Vue.use(VueRouter);
@@ -64,10 +63,6 @@ const routes = [
                 path: '/sysUser',
                 name: 'sysUser',
                 component: SysUserView
-            },{
-                path: '/targetDataSource',
-                name: 'targetDataSource',
-                component: TargetDataSourceView
             },{
                 path: '/resetPwd',
                 name: 'resetPwd',

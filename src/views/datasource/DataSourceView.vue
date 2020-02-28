@@ -158,22 +158,11 @@
 
                 </el-tab-pane>
                 <el-tab-pane label="表信息" name="second">
-                    <el-table
-                            :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
-                            style="width: 100%">
-                        <el-table-column
-                                prop="tableName"
-                                label="表名"
-                                width="240">
-                        </el-table-column>
-                        <el-table-column
-                                prop="status"
-                                label="状态"
-                                width="180">
-                        </el-table-column>
-                        <el-table-column
-                                prop="update"
-                                label="是否抽取">
+                    <el-table :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
+                              style="width: 100%">
+                        <el-table-column prop="tableName" label="表名" width="240"/>
+                        <el-table-column prop="status" label="状态" width="180"/>
+                        <el-table-column prop="update" label="是否抽取">
                             <template>
                                 <el-select v-model="updateOptionsValue" placeholder="请选择抽取方式">
                                     <el-option
@@ -185,14 +174,9 @@
                                 </el-select>
                             </template>
                         </el-table-column>
-                        <el-table-column
-                                prop="operation"
-                                label="操作">
+                        <el-table-column prop="operation" label="操作">
                             <template slot-scope="scope">
-                                <el-popover
-                                        ref="popover"
-                                        placement="right"
-                                        trigger="click">
+                                <el-popover ref="popover" placement="right" trigger="click">
                                     <el-radio-group v-model="defaultUpdateType" type="vertical"
                                                     @change="showUpdateType">
                                         <el-radio :label="0">全量覆盖抽取</el-radio>
@@ -200,9 +184,10 @@
                                         <el-radio :label="2">添加定时任务</el-radio>
                                     </el-radio-group>
                                 </el-popover>
-                                <el-button v-popover:popover type="text" size="small">抽取方式</el-button>
-                                <el-button type="text" size="small" @click="del(scope.row)">删除</el-button>
-                                <el-button type="text" size="small" v-if="updateOptionsValue ==  0"
+                                <el-button v-popover:popover type="text">抽取方式</el-button>
+                                <el-button type="text" @click="extractSetting(scope.row)">抽取设置</el-button>
+                                <el-button type="text" @click="del(scope.row)">删除</el-button>
+                                <el-button type="text" v-if="updateOptionsValue ==  0"
                                            @click="update(scope.row)">立即执行
                                 </el-button>
                             </template>
@@ -249,6 +234,26 @@
                 <el-button @click="visibleMap.createDialogVisible = false">取 消</el-button>
             </span>
         </el-dialog>
+
+        <el-dialog :visible.sync="visibleMap.extractSettingVisible" center width="60%">
+            <div slot="title" class="header-title">
+                <span> 抽取表信息设置</span>
+            </div>
+            <el-table :data="tableColumns" ref="tableColumns">
+                <el-table-column prop="columnName" label="字段名"/>
+                <el-table-column prop="columnTypeName" label="类型"/>
+                <el-table-column prop="targetColumnName" label="目标字段">
+                    <template slot-scope="scope">
+                        <el-input v-model="scope.row.targetColumnName"/>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="visibleMap.extractSettingVisible = false">取 消</el-button>
+                <el-button type="primary">确 定</el-button>
+            </div>
+        </el-dialog>
+
     </div>
 
 </template>
@@ -256,7 +261,7 @@
 
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
-    import {DataSource, DataSourceLog, DataTable} from "@/entity/DataSource";
+    import {DataSource, DataSourceLog, DataTable, DataTableColumnMapping} from "@/entity/DataSource";
     import {Result} from "@/entity/Base";
     import {Message, MessageBox} from "element-ui";
 
@@ -267,6 +272,8 @@
 
         //树数据
         private treeData = [];
+
+        private tableColumns: DataTableColumnMapping[] = [];
 
         created() {
             this.loadTree();
@@ -306,6 +313,7 @@
             excelFormVisible: false,
             ftpFormVisible: false,
             createDialogVisible: false,
+            extractSettingVisible: false,
         };
 
 
@@ -660,7 +668,7 @@
             });
         }
 
-        private tableData = [];
+        private tableData: DataTable[] = [];
 
         private currentPage = 1;
 
@@ -711,7 +719,7 @@
          * 根据sourceId查询table
          */
         getDataSourceTable(id: any) {
-            this.axios.post("tableInfo/getTable", this.dataSourceForm).then((result) => {
+            this.axios.post("tableInfo/findTable", this.dataSourceForm).then((result) => {
                 if (result.data.code == 200) {
                     this.tableData = result.data.data;
                 }
@@ -722,14 +730,17 @@
          * 删除
          * @param row
          */
-        del(row: any) {
+        del(row: DataTable) {
             let t: any = this;
             t.$confirm('此操作将删除本地数据库中表, 是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
             }).then(() => {
-                this.axios.post("tableInfo/delete", {'name': row.tableName, 'dataSourceId': this.dataSourceForm.id}).then((result) => {
+                this.axios.post("tableInfo/delete", {
+                    'name': row.tableName,
+                    'dataSourceId': this.dataSourceForm.id
+                }).then((result) => {
                     if (result.data.code == 200) {
                         Message.success("删除成功");
                         this.getDataSourceTable(this.dataSourceForm.id);
@@ -738,6 +749,22 @@
                     }
                 });
             })
+        }
+
+        /**
+         * 数据表映射设置
+         */
+        extractSetting(row: DataTable) {
+            this.visibleMap.extractSettingVisible = true;
+            this.axios.post("tableInfo/findTableColumnMapping", {
+                dataSourceId: this.dataSourceForm.id,
+                tableName: row.tableName
+            }).then(result => {
+                let v = new Result(result);
+                if (v.code == 200) {
+                    this.tableColumns = v.data;
+                }
+            });
         }
 
         private dataTable = new DataTable();
