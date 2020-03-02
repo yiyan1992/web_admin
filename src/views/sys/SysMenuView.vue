@@ -37,11 +37,19 @@
                 <el-form-item label="按钮" prop="button">
                     <el-checkbox v-model="form.button"/>
                 </el-form-item>
+                <el-form-item label="排序" prop="ranking">
+                    <el-col :span="18">
+                        <el-input v-model="form.ranking"/>
+                    </el-col>
+                    <el-col :span="6">
+                        <el-tag>值越小越靠前</el-tag>
+                    </el-col>
+                </el-form-item>
                 <el-form-item label="权限" prop="permission">
                     <el-input v-model="form.permission"/>
                 </el-form-item>
                 <el-form-item label="描述" prop="description">
-                    <el-input v-model="form.description"/>
+                    <el-input v-model="form.description" type="area"/>
                 </el-form-item>
                 <el-form-item>
                     <el-button @click="save('form')">保存</el-button>

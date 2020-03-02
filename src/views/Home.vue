@@ -59,7 +59,7 @@
         private menus: SysMenu[] = [];
 
         mounted() {
-            let t=this;
+            let t = this;
             t.messageNumber = 2;
             let item = sessionStorage.getItem("Authorization");
             if (item != null && item.length > 0) {
@@ -83,10 +83,10 @@
                 return e.parentId == null;
             })
             parents = parents.sort((a, b) => {
-                if (a.id == b.id) {
+                if (a.ranking == b.ranking) {
                     return 0;
                 }
-                return a.id > b.id ? 1 : -1;
+                return a.ranking > b.ranking ? 1 : -1;
             });
 
             parents.forEach(parent => {

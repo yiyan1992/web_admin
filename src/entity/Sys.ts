@@ -7,6 +7,8 @@ export class SysMenu {
 
     public button: boolean = false;
 
+    public ranking!: number;
+
     public url!: string;
 
     public permission!: string;
