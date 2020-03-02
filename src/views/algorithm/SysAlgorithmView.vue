@@ -63,6 +63,7 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="dialog.show = false">取 消</el-button>
+                <el-button @click="resetForm('dialog.form')">重 置</el-button>
                 <el-button @click="expressionTest">测 试</el-button>
                 <el-button type="primary" @click="dialogSave('dialog.form')">确 定</el-button>
             </div>

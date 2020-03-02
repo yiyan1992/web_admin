@@ -121,7 +121,6 @@
                         <el-form-item>
                             <el-upload
                                     :before-upload="beforeUpload"
-                                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                                     :action="uploadAction()"
                                     :headers="uploadHeader()"
                                     class="upload-demo"

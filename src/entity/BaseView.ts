@@ -8,7 +8,6 @@ export default class BaseView extends Vue {
 
     }
 
-
     handleSizeChange(val: number) {
         this.form.size = val - 1;
         this.searchForm("form");
@@ -17,5 +16,9 @@ export default class BaseView extends Vue {
     handleCurrentChange(val: number) {
         this.form.page = val - 1;
         this.searchForm("form");
+    }
+
+    resetForm(formName: string) {
+        (this.$refs[formName] as any).resetFields();
     }
 }
