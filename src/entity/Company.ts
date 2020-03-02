@@ -4,7 +4,7 @@ import {SysUser} from "@/entity/Sys";
 
 export class Company extends DataPage {
 
-    public id!: bigint;
+    public id!: string;
 
     public name!: string;
 

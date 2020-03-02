@@ -59,17 +59,16 @@
         private menus: SysMenu[] = [];
 
         mounted() {
-            let t = this;
-            t.messageNumber = 2;
+            this.messageNumber = 2;
             let item = sessionStorage.getItem("Authorization");
             if (item != null && item.length > 0) {
                 this.axios.get("checkToken").then(result => {
                     let v = new Result(result);
                     if (v.code == 200) {
-                        t.data = v.data;
-                        t.resolverMenu();
-                        t.permission();
-                        t.globalData = v.data;
+                        this.data = v.data;
+                        this.resolverMenu();
+                        this.permission();
+                        this.setCompanyInfo();
                         return;
                     }
                     this.$router.replace("/login")
@@ -111,6 +110,11 @@
                 return e.permission;
             }).join(",");
             sessionStorage.setItem("permission", arr);
+        }
+
+        setCompanyInfo() {
+            let company = this.data.company;
+            sessionStorage.setItem("company", company.id + "");
         }
 
         dropDownHandle(val: string) {

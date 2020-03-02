@@ -76,6 +76,7 @@
     import {JpaPage, Result} from "@/entity/Base";
     import BaseView from "@/entity/BaseView";
     import {Message, MessageBox} from "element-ui";
+    import {Company} from "@/entity/Company";
 
     @Component
     export default class SysAlgorithmView extends BaseView {
@@ -105,7 +106,7 @@
         }
 
         searchForm(form: string) {
-            this.axios.post("algorithm/findForPage", this.form).then(result => {
+            this.axios.post("algorithm/findForSysPage", this.form).then(result => {
                 let v = new Result(result);
                 this.page = v.translateJpa();
                 this.table = v.data.content;
@@ -116,7 +117,7 @@
             this.dialog.show = true;
             this.dialog.title = "添加";
             this.dialog.form = new Algorithm();
-            this.dialog.result="";
+            this.dialog.result = "";
         }
 
         expressionTest() {
@@ -135,7 +136,7 @@
                 this.dialog.form = v.data;
             });
             this.dialog.show = true;
-            this.dialog.result="";
+            this.dialog.result = "";
         }
 
         dialogSave(form: string) {

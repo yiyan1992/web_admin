@@ -108,9 +108,17 @@
         }
 
         searchForm(form: string) {
-            let company = this.globalData.company;
-            console.log(company.name)
-            this.axios.post("algorithm/findForPage", this.form).then(result => {
+            let item = sessionStorage.getItem("company");
+            if (item == null) {
+                Message.error("非公司用户!");
+                return;
+            } else {
+                let company = new Company();
+                company.id = item;
+                this.form.company = company;
+            }
+
+            this.axios.post("algorithm/findForCompanyPage", this.form).then(result => {
                 let v = new Result(result);
                 this.page = v.translateJpa();
                 this.table = v.data.content;
@@ -144,6 +152,16 @@
         }
 
         dialogSave(form: string) {
+            let item = sessionStorage.getItem("company");
+            if (item == null) {
+                Message.error("非公司用户!");
+                return;
+            } else {
+                let company = new Company();
+                company.id = item;
+                this.dialog.form.company = company;
+            }
+
             const ref: any = this.$refs[form];
             ref.validate((valid: boolean) => {
                 if (valid) {

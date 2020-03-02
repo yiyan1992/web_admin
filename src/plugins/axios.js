@@ -12,7 +12,6 @@ import {Message} from "element-ui";
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 const PREFIX = "Bearer ";
-console.log(process.env.VUE_APP_BASE_URL)
 let config = {
     baseURL: process.env.VUE_APP_BASE_URL,
     timeout: 60 * 1000, // Timeout

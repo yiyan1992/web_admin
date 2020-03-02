@@ -1,10 +1,10 @@
 import Vue from 'vue'
 import './plugins/axios'
-import './plugins/globalData'
-import App from './App.vue'
+import "vue-axios";
 import router from './router'
 import './plugins/element.js'
-import VueAxios from "vue-axios";
+import App from './App.vue'
+
 
 Vue.config.productionTip = false;
 
@@ -16,7 +16,6 @@ Vue.prototype.hasPermission = function (str: string): boolean {
     let set = new Set(strings);
     return set.has(str);
 }
-
 
 new Vue({
     router,
