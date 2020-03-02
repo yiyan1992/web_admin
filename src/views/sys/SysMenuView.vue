@@ -80,7 +80,8 @@
             name: [
                 {required: true, message: "请输入名称", trigger: "blur"},
                 {min: 3, max: 20, message: "长度在 3 到 20 个字符", trigger: "blur"}
-            ]
+            ],
+            permission: [{max: 20, message: "长度在 3 到 20 个字符", trigger: "blur"}],
         }
 
         created() {

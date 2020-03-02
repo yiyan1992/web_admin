@@ -12,8 +12,6 @@
                         <el-input v-model="form.username" clearable/>
                     </el-form-item>
                 </el-col>
-            </el-row>
-            <el-row>
                 <el-col :span="6">
                     <el-form-item label="邮箱">
                         <el-input v-model="form.email" clearable/>
@@ -120,7 +118,7 @@
 
     export default class SysUserView extends Vue {
 
-        private form: SysUser = new SysUser();
+        form: SysUser = new SysUser();
 
         private table: SysUser[] = [];
 
@@ -253,8 +251,15 @@
             });
         }
 
+        findAllCompany() {
+            this.axios.post("company/findForPage", this.form).then(result => {
+                let v = new Result(result);
+                this.companyData = v.data.content;
+            });
+        }
+
         handleSizeChange(val: number) {
-            this.form.size = val - 1;
+            this.form.size = val;
             this.searchForm("form");
         }
 
@@ -263,11 +268,8 @@
             this.searchForm("form");
         }
 
-        findAllCompany() {
-            this.axios.post("company/findForPage", this.form).then(result => {
-                let v = new Result(result);
-                this.companyData = v.data.content;
-            });
+        resetForm(formName: string) {
+            (this.$refs[formName] as any).resetFields();
         }
 
     }

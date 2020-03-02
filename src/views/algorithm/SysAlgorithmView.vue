@@ -72,17 +72,15 @@
 </template>
 
 <script lang="ts">
-    import {Component} from 'vue-property-decorator';
+    import {Component, Vue} from 'vue-property-decorator';
     import {Algorithm} from "@/entity/Algorithm";
     import {JpaPage, Result} from "@/entity/Base";
-    import BaseView from "@/entity/BaseView";
     import {Message, MessageBox} from "element-ui";
-    import {Company} from "@/entity/Company";
 
     @Component
-    export default class SysAlgorithmView extends BaseView {
+    export default class SysAlgorithmView extends Vue {
 
-        protected form: Algorithm = new Algorithm();
+        form: Algorithm = new Algorithm();
 
         private table: Algorithm[] = [];
 
@@ -156,6 +154,20 @@
                     });
                 }
             });
+        }
+
+        handleSizeChange(val: number) {
+            this.form.size = val;
+            this.searchForm("form");
+        }
+
+        handleCurrentChange(val: number) {
+            this.form.page = val - 1;
+            this.searchForm("form");
+        }
+
+        resetForm(formName: string) {
+            (this.$refs[formName] as any).resetFields();
         }
 
     }

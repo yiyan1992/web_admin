@@ -82,9 +82,9 @@
 
     export default class SysRoleView extends Vue {
 
-        private form: SysRole = new SysRole();
+        form: SysRole = new SysRole();
 
-        private table: SysRole[] = [];
+        table: SysRole[] = [];
 
         private page: JpaPage = new JpaPage();
 
@@ -106,8 +106,16 @@
             show: false
         }
 
-        created() {
+        mounted() {
             this.searchForm("form");
+        }
+
+        searchForm(form: string) {
+            this.axios.post("sys/role/findForPage", this.form).then(result => {
+                let v = new Result(result);
+                this.page = v.translateJpa();
+                this.table = v.data.content;
+            });
         }
 
         toAdd() {
@@ -154,6 +162,20 @@
             });
         }
 
+        handleSizeChange(val: number) {
+            this.form.size = val;
+            this.searchForm("form");
+        }
+
+        handleCurrentChange(val: number) {
+            this.form.page = val - 1;
+            this.searchForm("form");
+        }
+
+        resetForm(formName: string) {
+            (this.$refs[formName] as any).resetFields();
+        }
+
         dialogSave(form: string) {
             const ref: any = this.$refs[form];
             ref.validate((valid: boolean) => {
@@ -172,23 +194,6 @@
             });
         }
 
-        searchForm(form: string) {
-            this.axios.post("sys/role/findForPage", this.form).then(result => {
-                let v = new Result(result);
-                this.page = v.translateJpa();
-                this.table = v.data.content;
-            });
-        }
-
-        handleSizeChange(val: number) {
-            this.form.size = val - 1;
-            this.searchForm("form");
-        }
-
-        handleCurrentChange(val: number) {
-            this.form.page = val - 1;
-            this.searchForm("form");
-        }
     }
 
 

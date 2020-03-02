@@ -151,7 +151,7 @@
         }
 
         handleSizeChange(val: number) {
-            this.form.size = val - 1;
+            this.form.size = val;
             this.searchForm("form");
         }
 
