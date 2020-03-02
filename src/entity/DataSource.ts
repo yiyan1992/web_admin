@@ -40,7 +40,7 @@ export class DataSourceLog {
 
     public title!: string;
 
-    public createTime!: Date;
+    public createTime!: string;
 
     public user!: SysUser;
 }

@@ -1,5 +1,14 @@
 <template>
     <div>
+        <el-form :inline="true" :model="user" align="left">
+            <el-form-item>
+                <el-input v-model="user.name" placeholder="请输入用户姓名"></el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" @click="selectUser">查询</el-button>
+            </el-form-item>
+        </el-form>
+        <el-divider/>
         <el-table
                 ref="multipleTable"
                 :data="tableData"
@@ -13,12 +22,12 @@
             <el-table-column
                     prop="name"
                     label="姓名"
-                    width="120">
+            >
             </el-table-column>
             <el-table-column
                     prop="phone"
                     label="联系电话"
-                    width="120">
+            >
             </el-table-column>
             <el-table-column
                     prop="email"
@@ -52,13 +61,16 @@
 
         private tableData: SysUser[] = [];
 
-        private selectKeys: bigint[] = [];
+        private selectUsers: SysUser[] = [];
 
         private user: SysUser = new SysUser();
+
+        private userSelectForm: SysUser = new SysUser();
 
         private pages: JpaPage = new JpaPage();
 
         created() {
+            this.selectUsers = [];
             this.loadTableData();
         }
 
@@ -66,7 +78,7 @@
          * 加载用户
          */
         loadTableData() {
-            this.axios.post("sys/user/findForTable", this.user).then((result) => {
+            this.axios.post("sys/user/findForPage", this.user).then((result) => {
                 let v = new Result(result);
                 if (v.code == 200) {
                     this.pages = v.translateJpa();
@@ -82,10 +94,7 @@
          * @param val
          */
         handleSelectionChange(val: Array<any>) {
-            this.selectKeys = [];
-            val.forEach(e => {
-                this.selectKeys.push(e.id);
-            })
+            this.selectUsers = val;
         }
 
         /**
@@ -95,6 +104,21 @@
         handleCurrentChange(val: any) {
             this.user.page = val - 1;
             this.loadTableData();
+        }
+
+        /**
+         * 用户查询点击事件
+         */
+        selectUser() {
+            this.loadTableData();
+        }
+
+        /**
+         * 公司管理员方法回调
+         */
+        getCompanyManager() {
+            let sysUsers = this.selectUsers;
+            return sysUsers;
         }
 
 

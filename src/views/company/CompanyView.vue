@@ -57,36 +57,37 @@
             </el-pagination>
         </el-dialog>
 
-        <el-dialog :visible.sync="dialogShow">
+
+        <el-dialog :visible.sync="dialog.show">
             <div slot="title" class="header-title">
-                <span> {{ dialogTitle }}</span>
+                <span> {{ dialog.title }}</span>
             </div>
-            <el-form :model="dialogForm" label-width="110px" :rules="rules" ref="dialogForm"
+            <el-form :model="dialog.form" label-width="110px" :rules="dialog.rules" ref="dialogForm"
                      style="width: 50%;margin-left: 25%;margin-right: 25%;">
-                <el-form-item label="公司名称" prop="companyName">
-                    <el-input v-model="dialogForm.name" autocomplete="off"></el-input>
+                <el-form-item label="公司名称" prop="name">
+                    <el-input v-model="dialog.form.name" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="公司描述" prop="companyDesc">
-                    <el-input v-model="dialogForm.description" autocomplete="off"></el-input>
+                    <el-input v-model="dialog.form.description" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="公司管理员" prop="companyManager">
-                    <el-input v-model="dialogForm.user.id" autocomplete="off"></el-input>
+                <el-form-item label="负责人" prop="companyManager">
+                    <el-input v-model="dialog.form.user.id" autocomplete="off" @focus="selectManager"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogShow = false">取 消</el-button>
+                <el-button @click="dialog.show = false">取 消</el-button>
                 <el-button type="primary" @click="dialogSave('dialogForm')">确 定</el-button>
             </div>
         </el-dialog>
 
-        <el-dialog :visible.sync="selectUserData.show">
+        <el-dialog :visible.sync="selectManagerData.show">
             <div slot="title" class="header-title">
                 <span> 选择用户</span>
             </div>
-            <select-user v-bind:role-id="selectUserData.roleId" ref="selectUser"/>
+            <select-user ref="selectUser"/>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="selectUserData.show = false">取 消</el-button>
-                <el-button type="primary" @click="userSelect">确 定</el-button>
+                <el-button type="primary" @click="managerSelect">确 定</el-button>
             </div>
         </el-dialog>
     </div>
@@ -95,10 +96,10 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
 
-    import {Result, JpaPage} from '../../entity/Base';
+    import {JpaPage, Result} from '../../entity/Base';
     import {Company} from "@/entity/Company";
     import {SysUser} from "@/entity/Sys";
-    import {Message, MessageBox} from "element-ui";
+    import {Message} from "element-ui";
     import SelectUser from "@/components/SelectUser.vue";
 
     @Component({
@@ -118,33 +119,35 @@
 
         private page: JpaPage = new JpaPage();
 
-        private dialogTitle = '';
-        private dialogShow = false;
-        private dialogForm = new Company();
-        private rules = {
-            companyName: [
-                {required: true, message: "请输入公司名称", trigger: "blur"},
-            ],
-        }
+        private dialog = {
+            show: false,
+            title: "公司添加",
+            form: new Company(),
+            rules: {
+                name: [
+                    {required: true, message: "请输入公司名称", trigger: "blur"},
+                    {min: 3, max: 20, message: "长度在 3 到 20 个字符", trigger: "blur"}
+                ],
+            }
+        };
 
         created() {
             this.searchForm("form");
         }
 
         toAdd() {
-            this.dialogShow = true;
-            this.dialogTitle = "公司添加";
-            this.dialogForm = new Company();
-
+            this.dialog.show = true;
+            this.dialog.title = "公司添加";
+            this.dialog.form = new Company();
         }
 
         toUpdate(index: number, row: any) {
-            this.dialogTitle = "公司编辑";
+            this.dialog.title = "公司编辑";
             this.axios.get("company/findById/" + row.id).then(result => {
                 let v = new Result(result);
-                this.dialogForm = v.data;
+                this.dialog.form = v.data;
             });
-            this.dialogShow = true;
+            this.dialog.show = true;
         }
 
         toDelete(index: number, row: any) {
@@ -176,14 +179,14 @@
             ref = this.$refs[form];
             ref.validate((valid: boolean) => {
                 if (valid) {
-                    this.axios.post("company/save", this.dialogForm).then(result => {
+                    this.axios.post("company/save", this.dialog.form).then(result => {
                         let v = new Result(result);
                         if (v.code == 200) {
-                            this.dialogShow = false;
+                            this.dialog.show = false;
                             this.searchForm("form");
-                            (this as any).$message.success('保存成功!');
+                            Message.success('保存成功!');
                         } else {
-                            (this as any).$message.error('保存失败!');
+                            Message.error('保存失败!');
                         }
                     });
                 }
@@ -237,26 +240,31 @@
         }
 
 
-        private selectUserData = {
-            roleId: null,
+        private selectManagerData = {
             show: false
         }
 
         /**
-         * 添加员工
+         * 添加公司负责人
          * @param index
          * @param row
          */
-        addEmployee(index: number, row: any) {
-            this.selectUserData.show = true;
+        selectManager(index: number, row: any) {
+            this.selectManagerData.show = true;
         }
 
         /**
          * 用户选择弹窗确认事件
          */
-        userSelect() {
-            let selectUserData: any = this.$refs.selectUserData;
-            selectUserData.getSelectUser();
+        managerSelect() {
+            let selectManager: any = this.$refs.selectUser;
+            let user = selectManager.getCompanyManager();
+            if (user.length > 1) {
+                Message.error("公司负责人只允许存在一位!");
+            } else {
+                this.selectManagerData.show = false;
+                this.dialog.form.user = user[0];
+            }
         }
     }
 

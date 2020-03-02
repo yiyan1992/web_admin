@@ -50,9 +50,6 @@
                         <el-form-item label="服务器" prop="serverAddress">
                             <el-input v-model="dataSourceForm.serverAddress"/>
                         </el-form-item>
-                        <el-form-item label="数据库名称" prop="databaseName">
-                            <el-input v-model="dataSourceForm.databaseName"/>
-                        </el-form-item>
                         <el-form-item label="端口" prop="port">
                             <el-input v-model="dataSourceForm.port"/>
                         </el-form-item>
@@ -62,8 +59,18 @@
                         <el-form-item label="密 码" prop="password">
                             <el-input v-model="dataSourceForm.password"/>
                         </el-form-item>
+                        <el-form-item label="数据库名称" prop="databaseName" v-if="visibleMap.showDataBaseName">
+                            <el-select v-model="dataSourceForm.databaseName" placeholder="请选择数据库" style="width:100%">
+                                <el-option
+                                        v-for="item in dataBaseData"
+                                        :key="item.dataBaseName"
+                                        :label="item.dataBaseName"
+                                        :value="item.dataBaseName">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
                         <el-form-item>
-                            <el-button @click="createdSqlDataSource('mysqlForm')">连接</el-button>
+                            <el-button :type="visibleMap.buttonType" @click="createdSqlDataSource('mysqlForm')">连接</el-button>
                             <el-button @click="visibleMap.mysqlFormVisible=false">取消</el-button>
                         </el-form-item>
                     </el-form>
@@ -77,9 +84,6 @@
                         <el-form-item label="服务器" prop="serverAddress">
                             <el-input v-model="dataSourceForm.serverAddress"/>
                         </el-form-item>
-                        <el-form-item label="数据库名称" prop="databaseName">
-                            <el-input v-model="dataSourceForm.databaseName"/>
-                        </el-form-item>
                         <el-form-item label="端口" prop="port">
                             <el-input v-model="dataSourceForm.port"/>
                         </el-form-item>
@@ -91,6 +95,16 @@
                         </el-form-item>
                         <el-form-item label="SID" prop="password">
                             <el-input v-model="dataSourceForm.sId"/>
+                        </el-form-item>
+                        <el-form-item label="数据库名称" prop="databaseName" v-if="visibleMap.showDataBaseName">
+                            <el-select v-model="dataSourceForm.databaseName" placeholder="请选择数据库" style="width:100%">
+                                <el-option
+                                        v-for="item in dataBaseData"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value">
+                                </el-option>
+                            </el-select>
                         </el-form-item>
                         <el-form-item>
                             <el-button @click="createdSqlDataSource('oracleForm')">连接</el-button>
@@ -163,8 +177,8 @@
                         <el-table-column prop="tableName" label="表名" width="240"/>
                         <el-table-column prop="status" label="状态" width="180"/>
                         <el-table-column prop="update" label="是否抽取">
-                            <template>
-                                <el-select v-model="updateOptionsValue" placeholder="请选择抽取方式">
+                            <template slot-scope="scope">
+                                <el-select v-model="scope.row.update">
                                     <el-option
                                             v-for="item in updateOptions"
                                             :key="item.value"
@@ -181,15 +195,17 @@
                                                     @change="showUpdateType">
                                         <el-radio :label="0">全量覆盖抽取</el-radio>
                                         <el-radio :label="1">全量追加抽取</el-radio>
-                                        <el-radio :label="2">添加定时任务</el-radio>
                                     </el-radio-group>
                                 </el-popover>
-                                <el-button v-popover:popover type="text">抽取方式</el-button>
-                                <el-button type="text" @click="extractSetting(scope.row)">抽取设置</el-button>
-                                <el-button type="text" @click="del(scope.row)">删除</el-button>
-                                <el-button type="text" v-if="updateOptionsValue ==  0"
+                                <el-button v-popover:popover type="text" v-if="scope.row.update ==  0">抽取方式
+                                </el-button>
+                                <el-button type="text" v-if="scope.row.update ==  0"
+                                           @click="extractSetting(scope.row)">抽取设置
+                                </el-button>
+                                <el-button type="text" v-if="scope.row.update ==  0"
                                            @click="update(scope.row)">立即执行
                                 </el-button>
+                                <el-button type="text" @click="del(scope.row)">删除</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -202,8 +218,12 @@
                 </el-tab-pane>
                 <el-tab-pane label="操作记录" name="third">
                     <el-table stripe :data="operationLogTable" row-key="id">
-                        <el-table-column prop="createTime" label="时间" sortable/>
-                        <el-table-column prop="user.name" label="操作着"/>
+                        <el-table-column prop="createTime" label="操作时间" sortable>
+                            <template slot-scope="scope">
+                                {{scope.row.createTime| timeUtils}}
+                            </template>
+                        </el-table-column>
+                        <el-table-column prop="user.name" label="操作者"/>
                         <el-table-column prop="user.email" label="账号"/>
                         <el-table-column prop="title" label="操作记录"/>
                     </el-table>
@@ -294,6 +314,8 @@
 
         private operationLogTable: DataSourceLog[] = [];
 
+        private dataBaseData = [];
+
 
         //数配置
         private treeProp = {
@@ -314,6 +336,8 @@
             ftpFormVisible: false,
             createDialogVisible: false,
             extractSettingVisible: false,
+            showDataBaseName:false,
+            buttonType: '',
         };
 
 
@@ -325,7 +349,6 @@
                 {min: 1, max: 40, message: "长度在 1 到 40 个字符", trigger: "blur"}
             ],
             serverAddress: [{required: true, message: "请输入服务地址", trigger: "blur"},],
-            databaseName: [{required: true, message: "请输入数据库名称", trigger: "blur"},],
             port: [{required: true, message: "请输入端口号", trigger: "blur"},],
             username: [{required: true, message: "请输入用户名", trigger: "blur"}],
             password: [{required: true, message: "请输入密码", trigger: "blur"}]
@@ -346,6 +369,8 @@
             this.dataSourceForm = new DataSource();
             this.dataSourceForm.parentId = data.id;
             this.visibleMap.createDialogVisible = true;
+            this.visibleMap.showDataBaseName = false;
+            this.visibleMap.buttonType = 'primary';
         }
 
         /**
@@ -369,6 +394,7 @@
             this.currentData = {};
             this.dataSourceForm = new DataSource();
             this.visibleMap.createDialogVisible = true;
+            this.visibleMap.buttonType = "primary";
         }
 
         createDataSource(createType: any) {
@@ -420,8 +446,14 @@
         createdSqlDataSource(form: string) {
             let f = this.dataSourceForm;
             if (form == "mysqlForm") {
-                f.url = "jdbc:mysql://" + this.dataSourceForm.serverAddress + ":" + this.dataSourceForm.port + "/" +
-                    this.dataSourceForm.databaseName + "?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true";
+                if(f.databaseName != null){
+                    f.url = "jdbc:mysql://" + this.dataSourceForm.serverAddress + ":" + this.dataSourceForm.port + "/" +
+                        this.dataSourceForm.databaseName + "?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true";
+                }else {
+                    f.url = "jdbc:mysql://" + this.dataSourceForm.serverAddress + ":" + this.dataSourceForm.port +
+                        "?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true";
+                }
+
             } else {
                 f.url = "jdbc:oracle:thin:@" + this.dataSourceForm.serverAddress + ":" + this.dataSourceForm.port + ":" +
                     this.dataSourceForm.databaseName;
@@ -430,15 +462,25 @@
             const ref: any = this.$refs[form];
             ref.validate((valid: boolean) => {
                 if (valid) {
-                    this.axios.post("dataSource/checkConnection", f).then(result => {
-                        if (result.data.code == 200) {
-                            this.visibleMap.oracleFormVisible = false;
-                            this.visibleMap.mysqlFormVisible = false;
-                            this.loadTree();
-                        } else {
-                            (this as any).$message.error('连接异常!');
-                        }
-                    });
+                   this.checkSqlDataSourceConnect(f);
+                }
+            });
+        }
+
+        checkSqlDataSourceConnect(f: DataSource){
+            this.axios.post("dataSource/checkConnection", f).then(result => {
+                if (result.data.code == 200) {
+                    this.dataBaseData = result.data.data.allDataBase;
+                    if(f.databaseName != null){
+                        Message.success("数据库："+f.databaseName+"连接成功！")
+                    }else {
+                        this.dataSourceForm.id = result.data.data.id
+                        Message.success("数据源连接成功！")
+                    }
+                    this.visibleMap.showDataBaseName = true;
+                    this.loadTree();
+                } else {
+                    (this as any).$message.error('连接异常!');
                 }
             });
         }
@@ -584,17 +626,20 @@
             this.visibleMap.oracleFormVisible = false;
             this.visibleMap.mysqlFormVisible = false;
             this.visibleMap.ftpFormVisible = false;
+            this.visibleMap.showDataBaseName = false;
         }
 
 
         handleNodeClick(data: any, node: any, ev: any) {
             this.hideForm();
+            this.visibleMap.buttonType = "";
             switch (data.type) {
                 case -1:
                     this.visibleMap.folderFormVisible = true;
                     this.dataSourceForm = data;
                     break;
                 case 0:
+                    this.checkSqlDataSourceConnect(data);
                     if (data.url.startsWith("jdbc:mysql")) {
                         this.visibleMap.mysqlFormVisible = true;
                         this.dataSourceForm = data;
@@ -602,8 +647,10 @@
                         this.visibleMap.oracleFormVisible = true;
                         this.dataSourceForm = data;
                     }
-                    this.getDataSourceTable(data.id);
-                    this.tabClick(data.id)
+                    if(data.databaseName != null){
+                        this.getDataSourceTable(data.id);
+                        this.tabClick(data.id)
+                    }
                     break;
                 case 2:
                     this.visibleMap.excelFormVisible = true;
@@ -707,10 +754,10 @@
          */
         showUpdateType(value: any) {
             let t: any = this;
-            if (value == 2) {
-                Message.success("你选择了 添加定时任务");
+            if (value == 0) {
+                Message.success("你选择 全量覆盖抽取方式");
             } else {
-                Message.success("你选择了 其他任务");
+                Message.success("你选择 全量追加抽取方式");
             }
         }
 
@@ -787,7 +834,6 @@
                 }
             });
         }
-
     }
 
     class UploadFile {
