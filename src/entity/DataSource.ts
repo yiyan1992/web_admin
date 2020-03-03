@@ -1,5 +1,6 @@
 import {SysUser} from "@/entity/Sys";
 import {DataPage} from "@/entity/Base";
+import {Algorithm} from "@/entity/Algorithm";
 
 export class DataSource extends DataPage {
 
@@ -73,6 +74,8 @@ export class DataTableColumnMapping {
     public targetTableName!:string;
 
     public targetColumnName!:string;
+    
+    public algorithm:Algorithm=new Algorithm();
 }
 
 

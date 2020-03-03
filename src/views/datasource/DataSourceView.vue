@@ -1,4 +1,4 @@
-<template>
+<template xmlns:el-col="http://www.w3.org/1999/html">
     <div id="dataSource">
 
         <div id="left">
@@ -70,7 +70,8 @@
                             </el-select>
                         </el-form-item>
                         <el-form-item>
-                            <el-button :type="visibleMap.buttonType" @click="createdSqlDataSource('mysqlForm')">连接</el-button>
+                            <el-button :type="visibleMap.buttonType" @click="createdSqlDataSource('mysqlForm')">连接
+                            </el-button>
                             <el-button @click="visibleMap.mysqlFormVisible=false">取消</el-button>
                         </el-form-item>
                     </el-form>
@@ -256,11 +257,21 @@
 
         <el-dialog :visible.sync="visibleMap.extractSettingVisible" center width="60%">
             <div slot="title" class="header-title">
-                <span> 抽取表信息设置</span>
+                <span>抽取表信息设置</span>
             </div>
             <el-table :data="tableColumns" ref="tableColumns">
                 <el-table-column prop="columnName" label="字段名"/>
                 <el-table-column prop="columnTypeName" label="类型"/>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-col :span="6">
+                            <el-button @click="selectAlgorithm(scope.row)">算法</el-button>
+                        </el-col>
+                        <el-col :span="18">
+                            <el-input v-model="scope.row.algorithm.name" disabled/>
+                        </el-col>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="targetColumnName" label="目标字段">
                     <template slot-scope="scope">
                         <el-input v-model="scope.row.targetColumnName"/>
@@ -269,10 +280,20 @@
             </el-table>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="visibleMap.extractSettingVisible = false">取 消</el-button>
-                <el-button type="primary">确 定</el-button>
+                <el-button type="primary" @click="saveTableColumnMapping">确 定</el-button>
             </div>
         </el-dialog>
 
+        <el-dialog :visible.sync="visibleMap.algorithmDialog" center width="60%">
+            <div slot="title" class="header-title">
+                <span>选择算法</span>
+            </div>
+            <select-algorithm ref="selectAlgorithm"/>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="visibleMap.algorithmDialog = false">取 消</el-button>
+                <el-button type="primary" @click="saveAlgorithm">确 定</el-button>
+            </div>
+        </el-dialog>
     </div>
 
 </template>
@@ -283,8 +304,11 @@
     import {DataSource, DataSourceLog, DataTable, DataTableColumnMapping} from "@/entity/DataSource";
     import {Result} from "@/entity/Base";
     import {Message, MessageBox} from "element-ui";
+    import SelectAlgorithm from "@/components/SelectAlgorithm.vue";
 
-    @Component
+    @Component({
+        components: {SelectAlgorithm}
+    })
     export default class DataSourceView extends Vue {
 
         private defaultTab = 'first';
@@ -335,8 +359,9 @@
             ftpFormVisible: false,
             createDialogVisible: false,
             extractSettingVisible: false,
-            showDataBaseName:false,
+            showDataBaseName: false,
             buttonType: '',
+            algorithmDialog: false
         };
 
 
@@ -445,10 +470,10 @@
         createdSqlDataSource(form: string) {
             let f = this.dataSourceForm;
             if (form == "mysqlForm") {
-                if(f.databaseName != null){
+                if (f.databaseName != null) {
                     f.url = "jdbc:mysql://" + this.dataSourceForm.serverAddress + ":" + this.dataSourceForm.port + "/" +
                         this.dataSourceForm.databaseName + "?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true";
-                }else {
+                } else {
                     f.url = "jdbc:mysql://" + this.dataSourceForm.serverAddress + ":" + this.dataSourceForm.port +
                         "?useUnicode=true&characterEncoding=utf-8&allowMultiQueries=true";
                 }
@@ -461,18 +486,18 @@
             const ref: any = this.$refs[form];
             ref.validate((valid: boolean) => {
                 if (valid) {
-                   this.checkSqlDataSourceConnect(f);
+                    this.checkSqlDataSourceConnect(f);
                 }
             });
         }
 
-        checkSqlDataSourceConnect(f: DataSource){
+        checkSqlDataSourceConnect(f: DataSource) {
             this.axios.post("dataSource/checkConnection", f).then(result => {
                 if (result.data.code == 200) {
                     this.dataBaseData = result.data.data.allDataBase;
-                    if(f.databaseName != null){
-                        Message.success("数据库："+f.databaseName+"连接成功！")
-                    }else {
+                    if (f.databaseName != null) {
+                        Message.success("数据库：" + f.databaseName + "连接成功！")
+                    } else {
                         this.dataSourceForm.id = result.data.data.id
                         Message.success("数据源连接成功！")
                     }
@@ -646,7 +671,7 @@
                         this.visibleMap.oracleFormVisible = true;
                         this.dataSourceForm = data;
                     }
-                    if(data.databaseName != null){
+                    if (data.databaseName != null) {
                         this.getDataSourceTable(data.id);
                         this.tabClick(data.id)
                     }
@@ -830,6 +855,34 @@
                     this.getDataSourceTable(row.id);
                 } else {
                     Message.error(result.data.msg);
+                }
+            });
+        }
+
+        private currentDataTableMapping!: DataTableColumnMapping;
+
+        selectAlgorithm(row: DataTableColumnMapping) {
+            this.visibleMap.algorithmDialog = true;
+            this.currentDataTableMapping = row;
+        }
+
+        saveAlgorithm() {
+            let selectAlgorithm: any = this.$refs.selectAlgorithm;
+            let result = selectAlgorithm.submit();
+            this.currentDataTableMapping.algorithm = result;
+            this.visibleMap.algorithmDialog = false;
+        }
+
+        saveTableColumnMapping() {
+            let tableColumns = this.tableColumns;
+            if (tableColumns.length == 0) {
+                return;
+            }
+            this.axios.post("tableInfo/saveTableColumnMapping", tableColumns).then(result => {
+                let v = new Result(result);
+                if (v.code == 200) {
+                    Message.success("保存成功!");
+                    this.visibleMap.extractSettingVisible = false;
                 }
             });
         }
