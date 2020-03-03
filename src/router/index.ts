@@ -11,6 +11,8 @@ import SysUserView from "@/views/sys/SysUserView.vue";
 import ResetPwd from "@/views/ResetPwd.vue";
 import SysAlgorithmView from "@/views/algorithm/SysAlgorithmView.vue";
 import CompanyAlgorithmView from "@/views/algorithm/CompanyAlgorithmView.vue";
+import ProjectView from "@/views/company/ProjectView.vue";
+import PositionView from "@/views/company/PositionView.vue";
 
 Vue.use(VueRouter);
 
@@ -77,6 +79,14 @@ const routes = [
                 path: '/companyAlgorithm',
                 name: 'companyAlgorithm',
                 component: CompanyAlgorithmView
+            }, {
+                path: '/project',
+                name: 'project',
+                component: ProjectView
+            },{
+                path: '/position',
+                name: 'position',
+                component: PositionView
             }
         ]
     }

@@ -10,7 +10,7 @@ export class Company extends DataPage {
 
     public description!: string;
 
-    public user: SysUser = new SysUser();
+    public user!: SysUser;
 
     public users!: Set<SysUser>;
 
@@ -40,8 +40,26 @@ export class Position extends DataPage {
 
     public description!: string;
 
-    public department!: Department;
+    public department: Department = new Department();
 
-    public users!: Set<SysUser>;
+    public users: SysUser[] = [];
+
+}
+
+export class Project extends DataPage {
+
+    public id!: bigint;
+
+    public name!: string;
+
+    public description!: string;
+
+    public user!: SysUser;
+
+    public createTime!: string;
+
+    private company!: Company;
+
+    private users!: Set<SysUser>;
 
 }

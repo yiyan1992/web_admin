@@ -71,7 +71,7 @@
                     <el-input v-model="dialog.form.description" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="负责人" prop="companyManager">
-                    <el-input v-model="dialog.form.user.id" autocomplete="off" @focus="selectManager"></el-input>
+                    <el-input v-model="companyManager" autocomplete="off" @focus="selectManager"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -118,6 +118,8 @@
         private employeeTable: SysUser[] = [];
 
         private page: JpaPage = new JpaPage();
+
+        private companyManager:string ='';
 
         private dialog = {
             show: false,
@@ -258,12 +260,13 @@
          */
         managerSelect() {
             let selectManager: any = this.$refs.selectUser;
-            let user = selectManager.getCompanyManager();
+            let user = selectManager.getselectUsers();
             if (user.length > 1) {
                 Message.error("公司负责人只允许存在一位!");
             } else {
                 this.selectManagerData.show = false;
                 this.dialog.form.user = user[0];
+                this.companyManager = this.dialog.form.user.name;
             }
         }
     }

@@ -205,7 +205,7 @@
                                 <el-button type="text" v-if="scope.row.update ==  0"
                                            @click="update(scope.row)">立即执行
                                 </el-button>
-                                <el-button type="text" @click="del(scope.row)">删除</el-button>
+                                <el-button type="text" @click="del(scope.row)" v-if="scope.row.status ==  '增量'">删除</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -217,7 +217,8 @@
                     </el-pagination>
                 </el-tab-pane>
                 <el-tab-pane label="操作记录" name="third">
-                    <el-table stripe :data="operationLogTable" row-key="id">
+                    <el-table stripe :data="operationLogTable.slice((operationLogPage.number-1)*(operationLogPage.size),(operationLogPage.number)*(operationLogPage.size))"
+                              row-key="id">
                         <el-table-column prop="createTime" label="操作时间" sortable>
                             <template slot-scope="scope">
                                 {{scope.row.createTime| timeUtils}}
@@ -227,6 +228,12 @@
                         <el-table-column prop="user.email" label="账号"/>
                         <el-table-column prop="title" label="操作记录"/>
                     </el-table>
+                    <el-pagination @size-change="handleLogSizeChange"
+                                   @current-change="handleLogCurrentChange"
+                                   :current-page="operationLogPage.number"
+                                   :page-size="operationLogPage.size" layout="total, sizes, prev, pager, next, jumper"
+                                   :total="operationLogTable.length">
+                    </el-pagination>
                 </el-tab-pane>
             </el-tabs>
         </div>
@@ -262,16 +269,6 @@
             <el-table :data="tableColumns" ref="tableColumns">
                 <el-table-column prop="columnName" label="字段名"/>
                 <el-table-column prop="columnTypeName" label="类型"/>
-                <el-table-column label="操作">
-                    <template slot-scope="scope">
-                        <el-col :span="6">
-                            <el-button @click="selectAlgorithm(scope.row)">算法</el-button>
-                        </el-col>
-                        <el-col :span="18">
-                            <el-input v-model="scope.row.algorithm.name" disabled/>
-                        </el-col>
-                    </template>
-                </el-table-column>
                 <el-table-column prop="targetColumnName" label="目标字段">
                     <template slot-scope="scope">
                         <el-input v-model="scope.row.targetColumnName"/>
@@ -294,6 +291,7 @@
                 <el-button type="primary" @click="saveAlgorithm">确 定</el-button>
             </div>
         </el-dialog>
+
     </div>
 
 </template>
@@ -302,7 +300,7 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
     import {DataSource, DataSourceLog, DataTable, DataTableColumnMapping} from "@/entity/DataSource";
-    import {Result} from "@/entity/Base";
+    import {JpaPage, Result} from "@/entity/Base";
     import {Message, MessageBox} from "element-ui";
     import SelectAlgorithm from "@/components/SelectAlgorithm.vue";
 
@@ -402,11 +400,19 @@
          */
         remove(node: any, data: any) {
             if (data.children == undefined || data.children.length == 0) {
-                this.axios.post("/dataSource/del", data).then(result => {
-                    if (result.data.code == 200) {
-                        this.loadTree();
-                        this.hideForm();
-                    }
+                MessageBox.confirm('此操作将删除该数据源, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.axios.post("/dataSource/del", data).then(result => {
+                        if (result.data.code == 200) {
+                            this.loadTree();
+                            this.hideForm();
+                        }
+                    });
+                }).catch(() => {
+                    Message.info("已取消删除");
                 });
             } else {
                 Message.error('请先删除子节点!');
@@ -487,6 +493,9 @@
             ref.validate((valid: boolean) => {
                 if (valid) {
                     this.checkSqlDataSourceConnect(f);
+                } else {
+                    Message.error("请填写完整相关信息！")
+                    ref.resetFields();
                 }
             });
         }
@@ -885,6 +894,17 @@
                     this.visibleMap.extractSettingVisible = false;
                 }
             });
+        }
+
+
+        private operationLogPage = new JpaPage();
+
+        handleLogSizeChange(val: any) {
+            this.operationLogPage.size = val;
+        }
+
+        handleLogCurrentChange(val: any) {
+            this.operationLogPage.number = val;
         }
     }
 

@@ -51,13 +51,14 @@
 
 <script lang="ts">
     import {Component, Prop, Vue} from 'vue-property-decorator';
-    import {SysMenu, SysUser} from "@/entity/Sys";
+    import {SysUser} from "@/entity/Sys";
     import {JpaPage, Result} from "@/entity/Base";
     import {Message} from "element-ui";
 
     @Component
     export default class SelectUser extends Vue {
 
+        @Prop() private companyId!: bigint;
 
         private tableData: SysUser[] = [];
 
@@ -71,7 +72,14 @@
 
         created() {
             this.selectUsers = [];
-            this.loadTableData();
+            const {companyId} = this;
+            if (companyId > 0) {
+                this.loadEmployee();
+            } else {
+                this.loadTableData();
+            }
+
+
         }
 
         /**
@@ -83,6 +91,17 @@
                 if (v.code == 200) {
                     this.pages = v.translateJpa();
                     this.tableData = v.data.content;
+                } else {
+                    Message.error("加载失败!");
+                }
+            });
+        }
+
+        loadEmployee() {
+            this.axios.post("sys/user/findEmployee/" + this.companyId).then((result) => {
+                let v = new Result(result);
+                if (v.code == 200) {
+                    this.tableData =v.data;
                 } else {
                     Message.error("加载失败!");
                 }
@@ -113,10 +132,8 @@
             this.loadTableData();
         }
 
-        /**
-         * 公司管理员方法回调
-         */
-        getCompanyManager() {
+
+        getselectUsers() {
             let sysUsers = this.selectUsers;
             return sysUsers;
         }
