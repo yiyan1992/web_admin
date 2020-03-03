@@ -254,12 +254,13 @@
             let selectManager: any = this.$refs.selectUser;
             let user = selectManager.getselectUsers();
             let names = "";
-            user.forEach(u => {
-                names = names +  u.name + ",";
-                this.dialog.form.users.push(u);
+            for (let i = 0; i < user.length; i ++){
+                names = names +  user[i].name + ",";
+                this.dialog.form.users.push(user[i]);
                 this.selectManagerData.show = false;
-            })
+            }
             this.selectUsers = names;
+
         }
 
     }
