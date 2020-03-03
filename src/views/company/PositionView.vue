@@ -253,8 +253,7 @@
         managerSelect() {
             let selectManager: any = this.$refs.selectUser;
             let user = selectManager.getselectUsers();
-            console.log(user)
-            let names = ""
+            let names = "";
             user.forEach(u => {
                 names = names +  u.name + ",";
                 this.dialog.form.users.push(u);
