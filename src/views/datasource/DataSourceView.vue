@@ -269,6 +269,16 @@
             <el-table :data="tableColumns" ref="tableColumns">
                 <el-table-column prop="columnName" label="字段名"/>
                 <el-table-column prop="columnTypeName" label="类型"/>
+                <el-table-column label="操作">
+                    <template slot-scope="scope">
+                        <el-col :span="6">
+                            <el-button @click="selectAlgorithm(scope.row)">算法</el-button>
+                        </el-col>
+                        <el-col :span="18">
+                            <el-input v-model="scope.row.algorithm.name" disabled/>
+                        </el-col>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="targetColumnName" label="目标字段">
                     <template slot-scope="scope">
                         <el-input v-model="scope.row.targetColumnName"/>
