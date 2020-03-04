@@ -67,15 +67,17 @@ export class DataTableColumnMapping {
 
     public tableName!: string;
 
-    public columnName!:string;
+    public columnName!: string;
 
-    public columnTypeName!:string;
+    public columnTypeName!: string;
 
-    public targetTableName!:string;
+    public targetTableName!: string;
 
-    public targetColumnName!:string;
-    
-    public algorithm:Algorithm=new Algorithm();
+    public targetColumnName!: string;
+
+    public algorithm: Algorithm = new Algorithm();
+
+    public save!: boolean;
 }
 
 

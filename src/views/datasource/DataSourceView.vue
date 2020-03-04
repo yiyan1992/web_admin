@@ -217,7 +217,8 @@
                     </el-pagination>
                 </el-tab-pane>
                 <el-tab-pane label="操作记录" name="third">
-                    <el-table stripe :data="operationLogTable.slice((operationLogPage.number)*(operationLogPage.size),(operationLogPage.number+1)*(operationLogPage.size))"
+                    <el-table stripe
+                              :data="operationLogTable.slice((operationLogPage.number)*(operationLogPage.size),(operationLogPage.number+1)*(operationLogPage.size))"
                               row-key="id">
                         <el-table-column prop="createTime" label="操作时间" sortable>
                             <template slot-scope="scope">
@@ -269,14 +270,25 @@
             <el-table :data="tableColumns" ref="tableColumns">
                 <el-table-column prop="columnName" label="字段名"/>
                 <el-table-column prop="columnTypeName" label="类型"/>
+                <el-table-column label="本次保存">
+                    <template slot-scope="scope">
+                        <el-switch
+                                v-model="scope.row.save"
+                                active-text="保存"
+                                inactive-text="不保存">
+                        </el-switch>
+                    </template>
+                </el-table-column>
                 <el-table-column label="操作">
                     <template slot-scope="scope">
-                        <el-col :span="6">
-                            <el-button @click="selectAlgorithm(scope.row)">算法</el-button>
-                        </el-col>
-                        <el-col :span="18">
-                            <el-input v-model="scope.row.algorithm.name" disabled/>
-                        </el-col>
+                        <div>
+                            <el-col :span="6">
+                                <el-button @click="selectAlgorithm(scope.row)">算法</el-button>
+                            </el-col>
+                            <el-col :span="18">
+                                <el-input v-model="scope.row.algorithm.name" disabled/>
+                            </el-col>
+                        </div>
                     </template>
                 </el-table-column>
                 <el-table-column prop="targetColumnName" label="目标字段">
@@ -881,6 +893,8 @@
         selectAlgorithm(row: DataTableColumnMapping) {
             this.visibleMap.algorithmDialog = true;
             this.currentDataTableMapping = row;
+            let selectAlgorithm: any = this.$refs.selectAlgorithm;
+            selectAlgorithm.clear();
         }
 
         saveAlgorithm() {
@@ -895,7 +909,7 @@
             if (tableColumns.length == 0) {
                 return;
             }
-            this.axios.post("tableInfo/saveTableColumnMapping", tableColumns).then(result => {
+            this.axios.post("tableInfo/saveTableColumnMapping", tableColumns.filter(e => e.save)).then(result => {
                 let v = new Result(result);
                 if (v.code == 200) {
                     Message.success("保存成功!");
@@ -912,7 +926,7 @@
         }
 
         handleLogCurrentChange(val: any) {
-            this.operationLogPage.number = val-1;
+            this.operationLogPage.number = val - 1;
         }
     }
 

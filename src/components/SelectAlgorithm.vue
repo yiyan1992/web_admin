@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-table :data="tableData.slice((currentPage-1)*pageSize,currentPage*pageSize)"
-                  style="width: 100%" highlight-current-row @current-change="handleCurrentRowChange">
+                  style="width: 100%" highlight-current-row @current-change="handleCurrentRowChange" ref="table">
             <el-table-column type="index" width="50"></el-table-column>
             <el-table-column prop="name" label="名称"/>
             <el-table-column prop="description" label="描述"/>
@@ -26,7 +26,7 @@
 
         private tableData: Algorithm[] = [];
 
-        private currentRow!: Algorithm;
+        private currentRow!: Algorithm | null;
 
         private currentPage = 1;
 
@@ -59,12 +59,17 @@
             });
         }
 
+        clear(): void {
+            let table:any = this.$refs.table;
+            table.setCurrentRow();
+            this.currentRow = null;
+        }
+
         submit(): Algorithm {
             if (!this.currentRow) {
-                Message.warning("请先选择数据!");
                 return new Algorithm();
             }
-            return this.currentRow
+            return this.currentRow;
         }
 
     }
