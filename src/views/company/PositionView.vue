@@ -260,9 +260,7 @@
                 this.selectManagerData.show = false;
             }
             this.selectUsers = names;
-
         }
-
     }
 
 

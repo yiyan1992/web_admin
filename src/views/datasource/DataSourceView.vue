@@ -190,7 +190,7 @@
                         </el-table-column>
                         <el-table-column prop="operation" label="操作">
                             <template slot-scope="scope">
-                                <el-popover ref="popover" placement="right" trigger="click">
+                                <el-popover ref="popover" placement="top" trigger="click" v-if="scope.row.update ==  0">
                                     <el-radio-group v-model="defaultUpdateType" type="vertical"
                                                     @change="showUpdateType">
                                         <el-radio :label="0">全量覆盖抽取</el-radio>
@@ -205,7 +205,7 @@
                                 <el-button type="text" v-if="scope.row.update ==  0"
                                            @click="update(scope.row)">立即执行
                                 </el-button>
-                                <el-button type="text" @click="del(scope.row)" v-if="scope.row.status ==  '增量'">删除</el-button>
+                                <el-button type="text" @click="del(scope.row)">删除</el-button>
                             </template>
                         </el-table-column>
                     </el-table>
@@ -217,7 +217,7 @@
                     </el-pagination>
                 </el-tab-pane>
                 <el-tab-pane label="操作记录" name="third">
-                    <el-table stripe :data="operationLogTable.slice((operationLogPage.number-1)*(operationLogPage.size),(operationLogPage.number)*(operationLogPage.size))"
+                    <el-table stripe :data="operationLogTable.slice((operationLogPage.number)*(operationLogPage.size),(operationLogPage.number+1)*(operationLogPage.size))"
                               row-key="id">
                         <el-table-column prop="createTime" label="操作时间" sortable>
                             <template slot-scope="scope">
@@ -522,8 +522,6 @@
                     }
                     this.visibleMap.showDataBaseName = true;
                     this.loadTree();
-                } else {
-                    (this as any).$message.error('连接异常!');
                 }
             });
         }
@@ -749,12 +747,12 @@
         }
 
         tabClick(id: any) {
+            this.operationLogPage = new JpaPage();
             this.axios.post("dataSource/findAll7DaysLog/" + id).then(result => {
                 let v = new Result(result);
                 if (v.code == 200) {
                     this.operationLogTable = v.data;
                 }
-
             });
         }
 
@@ -914,7 +912,7 @@
         }
 
         handleLogCurrentChange(val: any) {
-            this.operationLogPage.number = val;
+            this.operationLogPage.number = val-1;
         }
     }
 
