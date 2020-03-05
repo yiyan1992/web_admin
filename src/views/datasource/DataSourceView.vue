@@ -293,7 +293,28 @@
                 </el-table-column>
                 <el-table-column prop="targetColumnName" label="目标字段">
                     <template slot-scope="scope">
-                        <el-input v-model="scope.row.targetColumnName"/>
+                        <el-select v-model="scope.row.targetColumnName" placeholder="请选择">
+                            <el-option :value="scope.row.columnName" />
+                            <el-option-group label="时间">
+                                <el-option value="放款月份"/>
+                                <el-option value="应还时间"/>
+                                <el-option value="还款时间"/>
+                                <el-option value="放款时间"/>
+                                <el-option value="实际还款时间"/>
+                            </el-option-group>
+
+                            <el-option-group label="期数">
+                                <el-option value="总期数"/>
+                                <el-option value="当前期数"/>
+                            </el-option-group>
+
+                            <el-option-group label="笔数">
+                                <el-option value="已还笔数"/>
+                                <el-option value="应还笔数"/>
+                                <el-option value="已还金额"/>
+                                <el-option value="应还金额"/>
+                            </el-option-group>
+                        </el-select>
                     </template>
                 </el-table-column>
             </el-table>
