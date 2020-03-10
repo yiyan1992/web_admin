@@ -129,7 +129,6 @@
                                     :file-list="fileList"
                                     :on-success="uploadSuccess"
                                     :on-error="uploadError"
-                                    :before-remove="uploadBeforeRemove"
                                     :on-remove="uploadRemove"
                                     multiple>
                                 <i class="el-icon-upload"></i>
@@ -152,9 +151,6 @@
                         <el-form-item label="服务器" prop="serverAddress">
                             <el-input v-model="dataSourceForm.serverAddress"/>
                         </el-form-item>
-                        <el-form-item label="文件/文件夹名称" prop="databaseName">
-                            <el-input v-model="dataSourceForm.databaseName"/>
-                        </el-form-item>
                         <el-form-item label="端口" prop="port">
                             <el-input v-model="dataSourceForm.port"/>
                         </el-form-item>
@@ -163,6 +159,16 @@
                         </el-form-item>
                         <el-form-item label="密 码" prop="password">
                             <el-input v-model="dataSourceForm.password"/>
+                        </el-form-item>
+                        <el-form-item label="文件/文件夹名称" prop="databaseName" v-if="visibleMap.showFtpSelectFile">
+                            <el-select v-model="dataSourceForm.databaseName" placeholder="请选择文件或文件夹" style="width:100%">
+                                <el-option
+                                        v-for="item in ftpFileName"
+                                        :key="item"
+                                        :label="item"
+                                        :value="item">
+                                </el-option>
+                            </el-select>
                         </el-form-item>
                         <el-form-item>
                             <el-button @click="createFtp('ftpForm')">连接</el-button>
@@ -203,7 +209,7 @@
                                            @click="extractSetting(scope.row)">抽取设置
                                 </el-button>
                                 <el-button type="text" v-if="scope.row.update ==  0"
-                                           @click="update(scope.row)">立即执行
+                                           @click="update(scope.row)" :loading="visibleMap.loading">立即执行
                                 </el-button>
                                 <el-button type="text" @click="del(scope.row)">删除</el-button>
                             </template>
@@ -294,7 +300,7 @@
                 <el-table-column prop="targetColumnName" label="目标字段">
                     <template slot-scope="scope">
                         <el-select v-model="scope.row.targetColumnName" placeholder="请选择">
-                            <el-option :value="scope.row.columnName" />
+                            <el-option :value="scope.row.columnName"/>
                             <el-option-group label="时间">
                                 <el-option value="放款月份"/>
                                 <el-option value="应还时间"/>
@@ -380,6 +386,7 @@
 
         private dataBaseData = [];
 
+        private ftpFileName = [];
 
         //数配置
         private treeProp = {
@@ -393,6 +400,7 @@
 
         //显示flag
         private visibleMap = {
+            loading: false,
             folderFormVisible: false,
             mysqlFormVisible: false,
             oracleFormVisible: false,
@@ -402,7 +410,8 @@
             extractSettingVisible: false,
             showDataBaseName: false,
             buttonType: '',
-            algorithmDialog: false
+            algorithmDialog: false,
+            showFtpSelectFile: false,
         };
 
 
@@ -535,7 +544,7 @@
             const ref: any = this.$refs[form];
             ref.validate((valid: boolean) => {
                 if (valid) {
-                    this.checkSqlDataSourceConnect(f);
+                    this.checkDataSourceConnect(f);
                 } else {
                     Message.error("请填写完整相关信息！")
                     ref.resetFields();
@@ -543,7 +552,7 @@
             });
         }
 
-        checkSqlDataSourceConnect(f: DataSource) {
+        checkDataSourceConnect(f: DataSource) {
             this.axios.post("dataSource/checkConnection", f).then(result => {
                 if (result.data.code == 200) {
                     this.dataBaseData = result.data.data.allDataBase;
@@ -604,12 +613,7 @@
             const ref: any = this.$refs[form];
             ref.validate((valid: boolean) => {
                 if (valid) {
-                    this.axios.post("dataSource/checkConnection", this.dataSourceForm).then(result => {
-                        if (result.data.code == 200) {
-                            this.visibleMap.ftpFormVisible = false;
-                            this.loadTree();
-                        }
-                    });
+                    this.checkDataSourceConnect(this.dataSourceForm);
                 }
             });
         }
@@ -637,7 +641,8 @@
             if (!flag) {
                 return false;
             }
-            const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+
+            const isExcel = (file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || file.type === "application/vnd.ms-excel");
             const isOver = file.size / 1024 / 1024 < 10;
             if (!isExcel) {
                 Message.error('上传只能是EXCEL文件!');
@@ -656,34 +661,20 @@
             for (let i = 0; i < fileList.length; i++) {
                 this.fileList.push({
                     name: fileList[i].name,
-                    url: fileList[i].response.data,
+                    url: fileList[i].response == null ? fileList[i].url : fileList[i].response.data,
                     size: fileList[i].size
                 });
             }
         }
 
         uploadSuccess(response: any, file: any, fileList: any) {
+            debugger
             this.transformFileList(fileList);
         }
 
         uploadError(err: any, file: any, fileList: any) {
             (this as any).$message.error("文件上传失败")
             this.transformFileList(fileList);
-        }
-
-        uploadBeforeRemove(file: any, fileList: any) {
-            let t: any = this;
-            t.$confirm('此操作将永久删除服务器中的文件, 是否继续?', '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            }).then(() => {
-            }).catch(() => {
-                t.$message({
-                    type: 'info',
-                    message: '已取消删除'
-                });
-            });
         }
 
         uploadRemove(file: any, fileList: any) {
@@ -713,7 +704,7 @@
                     this.dataSourceForm = data;
                     break;
                 case 0:
-                    this.checkSqlDataSourceConnect(data);
+                    this.checkDataSourceConnect(data);
                     if (data.url.startsWith("jdbc:mysql")) {
                         this.visibleMap.mysqlFormVisible = true;
                         this.dataSourceForm = data;
@@ -744,10 +735,15 @@
                             size: str3[i]
                         });
                     }
+                    this.getDataSourceTable(data.id);
                     break;
                 case 3:
+                    this.getDataSourceTable(data.id);
                     this.visibleMap.ftpFormVisible = true;
                     this.dataSourceForm = data;
+                    if (data.databaseName !== null) {
+                        this.visibleMap.showFtpSelectFile = true;
+                    }
                     break;
                 default:
             }
@@ -852,8 +848,7 @@
          * @param row
          */
         del(row: DataTable) {
-            let t: any = this;
-            t.$confirm('此操作将删除本地数据库中表, 是否继续?', '提示', {
+            MessageBox.confirm('此操作将删除本地数据库中表, 是否继续?', '提示', {
                 confirmButtonText: '确定',
                 cancelButtonText: '取消',
                 type: 'warning'
@@ -895,17 +890,19 @@
          * @param row
          */
         update(row: any) {
-            let t: any = this;
+            this.visibleMap.loading = true;
             this.dataTable.id = this.dataSourceForm.id;
             this.dataTable.tableName = row.tableName;
             this.dataTable.updateType = this.updateType;
             this.axios.post("tableInfo/update", this.dataTable).then((result) => {
                 if (result.data.code == 200) {
                     Message.success("数据抽取成功");
+                    let type: any = this.dataSourceForm.type;
                     this.getDataSourceTable(row.id);
                 } else {
                     Message.error(result.data.msg);
                 }
+                this.visibleMap.loading = false;
             });
         }
 
