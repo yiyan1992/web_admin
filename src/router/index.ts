@@ -13,6 +13,7 @@ import SysAlgorithmView from "@/views/algorithm/SysAlgorithmView.vue";
 import CompanyAlgorithmView from "@/views/algorithm/CompanyAlgorithmView.vue";
 import ProjectView from "@/views/company/ProjectView.vue";
 import PositionView from "@/views/company/PositionView.vue";
+import ChartView from "@/views/chart/ChartView.vue";
 
 Vue.use(VueRouter);
 
@@ -83,10 +84,14 @@ const routes = [
                 path: '/project',
                 name: 'project',
                 component: ProjectView
-            },{
+            }, {
                 path: '/position',
                 name: 'position',
                 component: PositionView
+            }, {
+                path: '/chart',
+                name: 'chart',
+                component: ChartView
             }
         ]
     }

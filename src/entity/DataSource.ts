@@ -46,6 +46,16 @@ export class DataSourceLog {
     public user!: SysUser;
 }
 
+export class DataSourceTable {
+    public id!: bigint;
+
+    public name!: string;
+
+    public newName!: string;
+
+    public dataSource!: DataSource;
+}
+
 export class DataTable {
 
     public id!: bigint;

@@ -4,13 +4,16 @@ import "vue-axios";
 import router from './router'
 import './plugins/element.js'
 import App from './App.vue'
-
 import "./filters";
-import {TimeUtils} from "@/filters";
+import {TimeOrString, TimeUtils} from "@/filters";
+
+import Echart from 'echarts';
+
+Vue.prototype.$echarts = Echart;
 
 Vue.config.productionTip = false;
-
 Vue.filter("timeUtils", TimeUtils)
+Vue.filter("timeOrString", TimeOrString)
 
 Vue.prototype.hasPermission = function (str: string): boolean {
     if (str == null || str.length == 0) return false;

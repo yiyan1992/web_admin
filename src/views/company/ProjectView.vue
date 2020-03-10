@@ -50,9 +50,8 @@
 <script lang="ts">
     import {Component, Vue} from 'vue-property-decorator';
 
-    import {JpaPage, Result} from '../../entity/Base';
+    import {JpaPage, Result} from '@/entity/Base';
     import {Company, Project} from "@/entity/Company";
-    import {SysUser} from "@/entity/Sys";
     import {Message} from "element-ui";
     import SelectUser from "@/components/SelectUser.vue";
 
