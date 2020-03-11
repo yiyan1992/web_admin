@@ -34,7 +34,206 @@
                     <span>Y轴:<el-select v-model="y_column" placeholder="请选择">
                         <el-option v-for="item in columns" :key="item"
                                    :value="item"/></el-select></span>
-                    <span>算法:</span>
+                    <span>算法:
+                        <el-select v-model="algorithm" placeholder="请选择">
+                            <el-option value="笔数回款率">
+                                <span style="float: left">笔数回款率</span>
+                                <span style="float: right">
+                                    <el-tooltip placement="top">
+                                      <div slot="content">
+                                          应还时间
+                                          <br/>还款时间
+                                          <br/>总期数
+                                          <br/>当前期数
+                                          <br/>已还笔数
+                                          <br/>应还笔数
+                                      </div>
+                                        <el-tag>要求</el-tag>
+                                    </el-tooltip>
+                                </span>
+                            </el-option>
+                            <el-option value="金额回款率">
+                                <span style="float: left">金额回款率</span>
+                                <span style="float: right">
+                                    <el-tooltip placement="top">
+                                      <div slot="content">
+                                          应还时间
+                                          <br/>还款时间
+                                          <br/>总期数
+                                          <br/>当前期数
+                                          <br/>已还金额
+                                          <br/>应还金额
+                                      </div>
+                                        <el-tag>要求</el-tag>
+                                    </el-tooltip>
+                                </span>
+                            </el-option>
+                            <el-option value="回款明细">
+                                <span style="float: left">回款明细</span>
+                                <span style="float: right">
+                                    <el-tooltip placement="top">
+                                      <div slot="content">
+                                          还款时间
+                                          <br/>放款时间
+                                          <br/>应还时间
+                                          <br/>总期数
+                                          <br/>当前期数
+                                          <br/>已还笔数
+                                          <br/>应还笔数
+                                      </div>
+                                        <el-tag>要求</el-tag>
+                                    </el-tooltip>
+                                </span>
+                            </el-option>
+                            <el-option value="笔数催回率">
+                                <span style="float: left">笔数催回率</span>
+                                <span style="float: right">
+                                    <el-tooltip placement="top">
+                                      <div slot="content">
+                                          应还时间
+                                          <br/>放款时间
+                                          <br/>总期数
+                                          <br/>当前期数
+                                          <br/>已还笔数
+                                          <br/>应还笔数
+                                      </div>
+                                        <el-tag>要求</el-tag>
+                                    </el-tooltip>
+                                </span>
+                                </el-option>
+                            <el-option value="金额催回率">
+                                <span style="float: left">金额催回率</span>
+                                <span style="float: right">
+                                    <el-tooltip placement="top">
+                                      <div slot="content">
+                                          应还时间
+                                          <br/>放款时间
+                                          <br/>总期数
+                                          <br/>当前期数
+                                          <br/>已还金额
+                                          <br/>应还金额
+                                      </div>
+                                        <el-tag>要求</el-tag>
+                                    </el-tooltip>
+                                </span>
+                            </el-option>
+                            <el-option value="笔数回款率2">
+                                <span style="float: left">笔数回款率</span>
+                                <span style="float: right">
+                                    <el-tooltip placement="top">
+                                      <div slot="content">
+                                          放款月份
+                                          <br/>总期数
+                                          <br/>当前期数
+                                          <br/>已还笔数
+                                          <br/>应还笔数
+                                      </div>
+                                        <el-tag>要求</el-tag>
+                                    </el-tooltip>
+                                </span>
+                            </el-option>
+                            <el-option value="金额回款率">
+                                <span style="float: left">金额回款率</span>
+                                <span style="float: right">
+                                    <el-tooltip placement="top">
+                                      <div slot="content">
+                                          放款月份
+                                          <br/>总期数
+                                          <br/>当前期数
+                                          <br/>已还金额
+                                          <br/>应还金额
+                                      </div>
+                                        <el-tag>要求</el-tag>
+                                    </el-tooltip>
+                                </span>
+                            </el-option>
+                            <el-option value="vintage">
+                                <span style="float: left">vintage</span>
+                                <span style="float: right">
+                                    <el-tooltip placement="top">
+                                      <div slot="content">
+                                          放款月份
+                                          <br/>总期数
+                                          <br/>当前期数
+                                          <br/>已还金额
+                                          <br/>应还金额
+                                      </div>
+                                        <el-tag>要求</el-tag>
+                                    </el-tooltip>
+                                </span>
+                            </el-option>
+                            <el-option value="w逾期率">
+                                <span style="float: left">w逾期率</span>
+                                <span style="float: right">
+                                    <el-tooltip placement="top">
+                                      <div slot="content">
+                                          放款月份
+                                          <br/>总期数
+                                          <br/>当前期数
+                                          <br/>已还金额
+                                          <br/>应还金额
+                                      </div>
+                                        <el-tag>要求</el-tag>
+                                    </el-tooltip>
+                                </span>
+                            </el-option>
+                            <el-option value="笔数催回率2">
+                                <span style="float: left">笔数催回率2</span>
+                                <span style="float: right">
+                                    <el-tooltip placement="top">
+                                      <div slot="content">
+                                          放款月份
+                                          <br/>总期数
+                                          <br/>当前期数
+                                          <br/>已还笔数
+                                          <br/>应还笔数
+                                      </div>
+                                        <el-tag>要求</el-tag>
+                                    </el-tooltip>
+                                </span>
+                            </el-option>
+                            <el-option value="金额催回率2">
+                                <span style="float: left">笔数催回率2</span>
+                                <span style="float: right">
+                                    <el-tooltip placement="top">
+                                      <div slot="content">
+                                          放款月份
+                                          <br/>总期数
+                                          <br/>当前期数
+                                          <br/>已还金额
+                                          <br/>应还金额
+                                      </div>
+                                        <el-tag>要求</el-tag>
+                                    </el-tooltip>
+                                </span>
+                            </el-option>
+                            <el-option value="回款衰减率">
+                                <span style="float: left">回款衰减率</span>
+                                <span style="float: right">
+                                    <el-tooltip placement="top">
+                                      <div slot="content">
+                                          放款月份
+                                          <br/>总期数
+                                          <br/>应还笔数
+                                      </div>
+                                        <el-tag>要求</el-tag>
+                                    </el-tooltip>
+                                </span>
+                            </el-option>
+                            <el-option value="还款时点">
+                                <span style="float: left">还款时点</span>
+                                <span style="float: right">
+                                    <el-tooltip placement="top">
+                                      <div slot="content">
+                                          实际还款时间
+                                          <br/>应还时间
+                                      </div>
+                                        <el-tag>要求</el-tag>
+                                    </el-tooltip>
+                                </span>
+                            </el-option>
+                        </el-select>
+                    </span>
                     <span><el-button @click="showPic">加载图表</el-button></span>
                     <el-divider/>
                     <div id="charts"></div>
@@ -160,6 +359,8 @@
         private x_column: string = "";
 
         private y_column: string = "";
+
+        private algorithm: string = "";
 
         private options: any = {
             title: {
