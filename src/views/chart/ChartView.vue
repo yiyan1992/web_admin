@@ -28,7 +28,15 @@
 
             <el-tabs type="card" v-model="defaultTab" stretch>
                 <el-tab-pane label="图" name="first">
-                    <el-button @click="showPic">加载图表</el-button>
+                    <span>X轴:  <el-select v-model="x_column" placeholder="请选择">
+                        <el-option v-for="item in columns" :key="item"
+                                   :value="item"/></el-select></span>
+                    <span>Y轴:<el-select v-model="y_column" placeholder="请选择">
+                        <el-option v-for="item in columns" :key="item"
+                                   :value="item"/></el-select></span>
+                    <span>算法:</span>
+                    <span><el-button @click="showPic">加载图表</el-button></span>
+                    <el-divider/>
                     <div id="charts"></div>
                 </el-tab-pane>
                 <el-tab-pane label="表" name="second">
@@ -149,9 +157,9 @@
             "rows": []
         };
 
-        private x_column: string = "当前期数";
+        private x_column: string = "";
 
-        private y_column: string = "应还金额";
+        private y_column: string = "";
 
         private options: any = {
             title: {
@@ -173,7 +181,7 @@
             series: [
                 {
                     data: [820, 932, 901, 934, 1290, 1330, 1320],
-                    type: "bar"
+                    type: "line"
                 }
             ]
         };
@@ -343,6 +351,7 @@
             const chart: any = (this as any).$echarts.init(ele);
             //调接口获取数据
             this.treatXColumn();
+            chart.clear();
             chart.setOption(this.options);
         }
 
@@ -378,7 +387,6 @@
             }
             this.y_column_arr = arr;
             this.options['series']['data'] = arr;
-            console.log(this.options)
         }
 
         handleLogSizeChange(val: any) {
